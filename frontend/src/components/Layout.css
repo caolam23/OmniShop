@@ -1,0 +1,19 @@
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+.main-content {
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Responsive - Mobile */
+@media (max-width: 991.98px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+.main-content > div {
+  padding: 20px;
+}

@@ -1,0 +1,29 @@
+.sidebar {
+  min-height: calc(100vh - 56px);
+  width: 250px;
+  border-right: 1px solid #dee2e6;
+  position: fixed;
+  left: 0;
+  top: 56px;
+  overflow-y: auto;
+}
+
+.sidebar-link {
+  color: #333;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+  padding-left: 16px !important;
+}
+
+.sidebar-link:hover {
+  background-color: #f8f9fa;
+  border-left-color: #007bff;
+  color: #007bff;
+}
+
+.sidebar-link.active {
+  background-color: #e7f1ff;
+  border-left-color: #007bff;
+  color: #007bff;
+}

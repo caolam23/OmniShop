@@ -1,0 +1,345 @@
+/* CSS Reset & Variables */
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --bg-body: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
+
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+
+.dashboardContainer {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Layout Setup */
+.sidebar {
+  width: 260px;
+  background-color: var(--bg-surface);
+  border-right: 1px solid var(--border-color);
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  z-index: 10;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 260px;
+  padding: 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar Styles */
+.brand {
+  display: flex; 
+  align-items: center; 
+  gap: 10px;
+  font-size: 1.25rem; 
+  font-weight: 700; 
+  color: var(--text-main);
+  margin-bottom: 2.5rem; 
+  padding: 0 0.75rem;
+}
+
+.brandSvg { 
+  color: var(--primary); 
+}
+
+.navMenu { 
+  list-style: none; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.5rem; 
+}
+
+.navItem {
+  display: flex; 
+  align-items: center; 
+  gap: 12px;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted); 
+  font-weight: 500; 
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.navItem:hover { 
+  background-color: var(--bg-body); 
+  color: var(--text-main); 
+}
+
+.navItemActive { 
+  background-color: #eef2ff; 
+  color: var(--primary); 
+  font-weight: 600; 
+}
+
+/* Header Styles */
+.header { 
+  margin-bottom: 2.5rem; 
+}
+
+.pageTitle { 
+  font-size: 1.875rem; 
+  font-weight: 700; 
+  letter-spacing: -0.025em; 
+  margin-bottom: 0.25rem;
+}
+
+.pageSubtitle { 
+  color: var(--text-muted); 
+  font-size: 0.95rem; 
+}
+
+/* Alert/Error Styles */
+.alertError {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+}
+
+.alertInfo {
+  background-color: #dbeafe;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+}
+
+/* Dashboard Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Cards */
+.card {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover { 
+  box-shadow: var(--shadow-md); 
+  transform: translateY(-2px); 
+}
+
+/* Stat Card Content */
+.statHeader { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: flex-start; 
+  margin-bottom: 1rem; 
+}
+
+.statTitle { 
+  color: var(--text-muted); 
+  font-size: 0.875rem; 
+  font-weight: 500; 
+}
+
+.statIcon {
+  width: 40px; 
+  height: 40px; 
+  border-radius: 10px;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+}
+
+.iconBlue { 
+  background: #eef2ff; 
+  color: #4f46e5; 
+}
+
+.iconGreen { 
+  background: #dcfce7; 
+  color: #16a34a; 
+}
+
+.iconOrange { 
+  background: #ffedd5; 
+  color: #ea580c; 
+}
+
+.iconPurple { 
+  background: #f3e8ff; 
+  color: #9333ea; 
+}
+
+.statValue { 
+  font-size: 2rem; 
+  font-weight: 700; 
+  letter-spacing: -0.025em; 
+  color: var(--text-main); 
+  line-height: 1; 
+  margin-bottom: 0.5rem;
+}
+
+.statTrend { 
+  font-size: 0.85rem; 
+  font-weight: 500; 
+}
+
+.trendUp { 
+  color: #16a34a; 
+}
+
+/* Bottom Grid (User Info & Quick Links) */
+.bottomGrid {
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 1.5rem;
+}
+
+.sectionTitle { 
+  font-size: 1.1rem; 
+  font-weight: 600; 
+  margin-bottom: 1.25rem; 
+  border-bottom: 1px solid var(--border-color); 
+  padding-bottom: 0.75rem;
+}
+
+/* Info Item */
+.infoRow { 
+  display: flex; 
+  justify-content: space-between; 
+  padding: 0.875rem 0; 
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.infoRow:last-child { 
+  border-bottom: none; 
+}
+
+.infoLabel { 
+  color: var(--text-muted); 
+  font-weight: 500; 
+  font-size: 0.95rem;
+}
+
+.infoValue { 
+  font-weight: 600; 
+  color: var(--text-main); 
+  display: flex; 
+  align-items: center; 
+  gap: 8px;
+}
+
+.badge {
+  background-color: #eef2ff; 
+  color: var(--primary);
+  padding: 0.25rem 0.75rem; 
+  border-radius: 999px;
+  font-size: 0.75rem; 
+  font-weight: 600;
+}
+
+/* Quick Links */
+.quickLinkItem {
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
+  padding: 1rem; 
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm); 
+  margin-bottom: 0.75rem;
+  text-decoration: none; 
+  color: var(--text-main); 
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.quickLinkItem:hover {
+  border-color: var(--primary); 
+  background-color: #f8fafc;
+}
+
+.linkLeft { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+}
+
+.statusActive {
+  color: #16a34a;
+}
+
+/* Logout Button */
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.logoutBtn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+
+.logoutBtn:hover {
+  background-color: #dc2626;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.logoutBtn:active {
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .bottomGrid { 
+    grid-template-columns: 1fr; 
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar { 
+    display: none; 
+  }
+  .mainContent { 
+    margin-left: 0; 
+    padding: 1.5rem; 
+  }
+}
