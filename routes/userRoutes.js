@@ -6,11 +6,11 @@ const { verifyToken, checkRole } = require('../middlewares/authMiddleware');
 // All user routes are protected
 router.use(verifyToken);
 
-// Get all users & Get user by ID
-router.get('/', userController.getAllUsers);
-router.get('/:id', userController.getUserById);
+// Admin only routes - Get all users & Get user by ID
+router.get('/', checkRole(['Admin']), userController.getAllUsers);
+router.get('/:id', checkRole(['Admin']), userController.getUserById);
 
-// Admin only routes
+// Admin only routes - Create, Update, Delete
 router.post('/', checkRole(['Admin']), userController.createUser);
 router.put('/:id', checkRole(['Admin']), userController.updateUser);
 router.delete('/:id', checkRole(['Admin']), userController.deleteUser);

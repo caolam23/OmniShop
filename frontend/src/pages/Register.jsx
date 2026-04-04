@@ -63,9 +63,19 @@ export default function Register() {
 
       if (response.success) {
         setSuccess('Registration successful! Logging in...');
-        // Automatically redirect to dashboard since token was already saved by authApi.register
+        // Check user role and redirect accordingly
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : response.user;
+        const userRole = user?.role?.name || user?.role;
+
         setTimeout(() => {
-          navigate('/dashboard');
+          if (userRole === 'Admin') {
+            // Admin goes to dashboard
+            navigate('/dashboard');
+          } else {
+            // Regular user goes to user profile
+            navigate('/user');
+          }
         }, 1000);
       } else {
         setError(response.message || 'Registration failed');

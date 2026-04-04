@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useEffect, useState } from 'react';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import UserProfile from './pages/UserProfile';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import RoleManagement from './pages/RoleManagement';
@@ -24,7 +25,7 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
       const userRole = user.role?.name || user.role;
 
       if (!allowedRoles.includes(userRole)) {
-        // User doesn't have required role
+        // User doesn't have required role - redirect to user profile
         return (
           <div className="d-flex flex-column align-items-center justify-content-center min-vh-100">
             <div className="text-center">
@@ -33,8 +34,8 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
                 You don't have permission to access this page.
               </p>
               <p className="text-muted">Your role: {userRole}</p>
-              <a href="/dashboard" className="btn btn-primary mt-3">
-                Back to Dashboard
+              <a href="/user" className="btn btn-primary mt-3">
+                Back to Profile
               </a>
             </div>
           </div>
@@ -68,11 +69,21 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected Routes - Dashboard (all authenticated users) */}
+        {/* Protected Routes - User Profile (all authenticated users) */}
+        <Route
+          path="/user"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected Routes - Dashboard (Admin Only) */}
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['Admin']}>
               <Dashboard />
             </ProtectedRoute>
           }

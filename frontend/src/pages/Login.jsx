@@ -20,8 +20,18 @@ export default function Login() {
       const response = await authApi.login(email, password);
 
       if (response.success) {
-        // Login successful, redirect to dashboard
-        navigate('/dashboard');
+        // Check user role and redirect accordingly
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : response.user;
+        const userRole = user?.role?.name || user?.role;
+
+        if (userRole === 'Admin') {
+          // Admin goes to dashboard
+          navigate('/dashboard');
+        } else {
+          // Regular user goes to user profile
+          navigate('/user');
+        }
       } else {
         setError(response.message || 'Login failed');
       }

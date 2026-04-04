@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 let { uploadExcel, uploadImage } = require('../utils/uploadHandler')
+let { verifyToken, checkRole } = require('../middlewares/authMiddleware');
 let path = require('path')
 let excelJs = require('exceljs')
 let categoriesModel = require('../schemas/categories')
@@ -9,14 +10,14 @@ let inventoriesModel = require('../schemas/inventories')
 let mongoose = require('mongoose')
 let slugify = require('slugify')
 
-router.post('/one_file', uploadImage.single('file'), function (req, res, next) {
+router.post('/one_file', verifyToken, checkRole(['Admin']), uploadImage.single('file'), function (req, res, next) {
     res.send({
         filename: req.file.filename,
         path: req.file.path,
         size: req.file.size
     })
 })
-router.post('/multiple_file', uploadImage.array('files', 5), function (req, res, next) {
+router.post('/multiple_file', verifyToken, checkRole(['Admin']), uploadImage.array('files', 5), function (req, res, next) {
     console.log(req.body);
     res.send(req.files.map(f => {
         return {
@@ -30,7 +31,7 @@ router.get('/:filename', function (req, res, next) {
     let pathFile = path.join(__dirname, '../uploads', req.params.filename)
     res.sendFile(pathFile)
 })
-router.post('/excel', uploadExcel.single('file'), async function (req, res, next) {
+router.post('/excel', verifyToken, checkRole(['Admin']), uploadExcel.single('file'), async function (req, res, next) {
     //workbook->worksheet->row/column->cell
     let workBook = new excelJs.Workbook();
     let pathFile = path.join(__dirname, '../uploads', req.file.filename)

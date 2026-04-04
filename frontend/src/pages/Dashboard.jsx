@@ -224,8 +224,14 @@ export default function Dashboard() {
                 <h3 className={styles.sectionTitle}>Thao tác nhanh</h3>
 
                 <a href="/users" className={styles.quickLinkItem}>
-                  <div className={styles.linkLeft}>
-                    <span style={{ fontSize: '1.25rem' }}>👥</span> Quản lý Người dùng & Phân quyền
+                  <div className={styles.linkLeft} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Quản lý Người dùng & Phân quyền
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
                     <polyline points="9 18 15 12 9 6"></polyline>
@@ -233,8 +239,13 @@ export default function Dashboard() {
                 </a>
 
                 <a href="/products" className={styles.quickLinkItem}>
-                  <div className={styles.linkLeft}>
-                    <span style={{ fontSize: '1.25rem' }}>🛍️</span> Cập nhật Sản phẩm & Danh mục
+                  <div className={styles.linkLeft} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                      <line x1="3" y1="6" x2="21" y2="6"></line>
+                      <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    Cập nhật Sản phẩm & Danh mục
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
                     <polyline points="9 18 15 12 9 6"></polyline>
@@ -242,8 +253,14 @@ export default function Dashboard() {
                 </a>
 
                 <a href="/orders" className={styles.quickLinkItem}>
-                  <div className={styles.linkLeft}>
-                    <span style={{ fontSize: '1.25rem' }}>📦</span> Duyệt đơn hàng (Transaction)
+                  <div className={styles.linkLeft} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                    Duyệt đơn hàng (Transaction)
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
                     <polyline points="9 18 15 12 9 6"></polyline>
@@ -251,8 +268,11 @@ export default function Dashboard() {
                 </a>
 
                 <a href="#" className={styles.quickLinkItem}>
-                  <div className={styles.linkLeft}>
-                    <span style={{ fontSize: '1.25rem' }}>💬</span> Kênh Live Chat & Đánh giá
+                  <div className={styles.linkLeft} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Kênh Live Chat & Đánh giá
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
                     <polyline points="9 18 15 12 9 6"></polyline>
