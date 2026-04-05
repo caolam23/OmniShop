@@ -6,6 +6,8 @@ import UserProfile from './pages/UserProfile';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import RoleManagement from './pages/RoleManagement';
+import OrderManagement from './pages/OrderManagement';
+import MyOrders from './pages/MyOrders';
 import './App.css';
 
 // Protected Route Component - Check token and optional role
@@ -104,6 +106,26 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['Admin']}>
               <RoleManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin/Staff Only: Quản lý đơn hàng */}
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Staff']}>
+              <OrderManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Customer: Lịch sử đơn hàng của tôi */}
+        <Route
+          path="/my-orders"
+          element={
+            <ProtectedRoute>
+              <MyOrders />
             </ProtectedRoute>
           }
         />
