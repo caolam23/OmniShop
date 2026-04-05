@@ -5,6 +5,8 @@ import categoryApi from '../api/categoryApi';
 import supplierApi from '../api/supplierApi';
 import authApi from '../api/authApi';
 import AdminSidebar from '../components/AdminSidebar';
+import ProductModal from './ProductModal';
+import ProductTable from './ProductTable';
 import styles from './ProductManagement.module.css';
 
 export default function ProductManagement() {
@@ -20,7 +22,7 @@ export default function ProductManagement() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  // States Query Params (Phân trang, Tìm kiếm, Sắp xếp)
+  // States Query Params 
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -41,11 +43,9 @@ export default function ProductManagement() {
     stock: '',
     category: '',
     supplier: '',
-    image: null, // Sẽ chứa File object khi upload
+    image: null,
   });
   const [imagePreview, setImagePreview] = useState(null); // URL để preview ảnh
-
-  // 1. Fetch Categories & Suppliers khi load trang
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
@@ -62,7 +62,6 @@ export default function ProductManagement() {
     fetchDropdownData();
   }, []);
 
-  // 2. Fetch Products với Debounce Search (Chờ 500ms sau khi ngừng gõ mới gọi API)
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchProducts();
@@ -118,7 +117,7 @@ export default function ProductManagement() {
       stock: product.stock,
       category: product.category?._id || '',
       supplier: product.supplier?._id || '',
-      image: null, // Không load file cũ vào input file được, chỉ preview
+      image: null, 
     });
     setImagePreview(product.image ? `http://localhost:3000${product.image}` : null);
     setShowModal(true);
@@ -129,7 +128,7 @@ export default function ProductManagement() {
     const file = e.target.files[0];
     if (file) {
       setFormData({ ...formData, image: file });
-      setImagePreview(URL.createObjectURL(file)); // Preview ảnh ngay lập tức
+      setImagePreview(URL.createObjectURL(file)); 
     }
   };
 
@@ -151,7 +150,6 @@ export default function ProductManagement() {
       if (formData.category) submitData.append('category', formData.category);
       if (formData.supplier) submitData.append('supplier', formData.supplier);
       
-      // Chỉ append image nếu người dùng có chọn file mới
       if (formData.image instanceof File) {
         submitData.append('image', formData.image);
       }
@@ -181,7 +179,7 @@ export default function ProductManagement() {
         const response = await productApi.deleteProduct(id);
         if (response.success) {
           setSuccess('Đã xóa sản phẩm!');
-          fetchProducts(); // Refresh danh sách (API backend sẽ tự ẩn sản phẩm isDeleted=true do bạn đã setup)
+          fetchProducts(); 
           setTimeout(() => setSuccess(''), 3000);
         }
       } catch (err) {
@@ -211,7 +209,6 @@ export default function ProductManagement() {
         {error && <div className={styles.alertError}>{error}</div>}
         {success && <div className={styles.alertSuccess}>{success}</div>}
 
-        {/* Toolbar: Tìm kiếm, Sắp xếp, Lọc */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
           <button className={styles.btnPrimary} onClick={handleAddNew} style={{ height: '42px', padding: '0 1.25rem', whiteSpace: 'nowrap' }}>
             + Thêm Sản Phẩm
@@ -226,7 +223,7 @@ export default function ProductManagement() {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
+                setCurrentPage(1); 
               }}
             />
             
@@ -289,77 +286,12 @@ export default function ProductManagement() {
           </div>
         </div>
 
-        {/* Bảng Dữ Liệu */}
-        {loading ? (
-          <div className={styles.loadingContainer}><div className={styles.spinner}></div></div>
-        ) : (
-          <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <thead className={styles.tableHead}>
-                <tr>
-                  <th className={styles.tableHeadCell}>Ảnh</th>
-                  <th className={styles.tableHeadCell}>Tên SP</th>
-                  <th className={styles.tableHeadCell}>Giá</th>
-                  <th className={styles.tableHeadCell}>Tồn Kho</th>
-                  <th className={styles.tableHeadCell}>Danh Mục</th>
-                  <th className={styles.tableHeadCell}>Thao Tác</th>
-                </tr>
-              </thead>
-              <tbody className={styles.tableBody}>
-                {products.length > 0 ? products.map(p => (
-                  <tr key={p._id}>
-                    <td className={styles.tableCell}>
-                      {p.image ? (
-                        <img 
-                          src={`http://localhost:3000${p.image}`} 
-                          alt={p.name} 
-                          style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
-                        />
-                      ) : (
-                        <div style={{ width: '50px', height: '50px', backgroundColor: '#e2e8f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>No Img</div>
-                      )}
-                    </td>
-                    <td className={styles.tableCell}>
-                      {/* Gạch ngang nếu SP bị xóa mềm (Dù API của chúng ta đang filter isDeleted: ne true) */}
-                      <span style={{ textDecoration: p.isDeleted ? 'line-through' : 'none', fontWeight: 500 }}>
-                        {p.name}
-                      </span>
-                    </td>
-                    <td className={styles.tableCell}>
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price)}
-                    </td>
-                    <td className={styles.tableCell}>
-                      <span className={`${styles.badge} ${p.stock > 0 ? styles.badgeSuccess : styles.badgeWarning}`}>
-                        {p.stock}
-                      </span>
-                    </td>
-                    <td className={styles.tableCell}>{p.category?.name || '--'}</td>
-                    <td className={styles.tableCell}>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button 
-                          className={styles.btnSmall} 
-                          style={{ backgroundColor: '#3b82f6', color: 'white' }}
-                          onClick={() => handleEdit(p)}
-                        >
-                          Sửa
-                        </button>
-                        <button 
-                          className={styles.btnSmall} 
-                          style={{ backgroundColor: '#ef4444', color: 'white' }}
-                          onClick={() => handleDelete(p._id)}
-                        >
-                          Xóa
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )) : (
-                  <tr><td colSpan="6" className={styles.noData}>Không tìm thấy sản phẩm nào</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <ProductTable 
+          loading={loading} 
+          products={products} 
+          handleEdit={handleEdit} 
+          handleDelete={handleDelete} 
+        />
 
         {/* Phân trang */}
         {totalPages > 1 && (
@@ -390,107 +322,18 @@ export default function ProductManagement() {
           </div>
         )}
 
-        {/* Modal Thêm/Sửa */}
-        {showModal && (
-          <div className={`${styles.modal} ${styles.show}`}>
-            <div className={styles.modalContent} style={{ maxWidth: '600px' }}>
-              <div className={styles.modalHeader}>
-                <h2 className={styles.modalTitle}>{isEditMode ? 'Sửa Sản Phẩm' : 'Thêm Sản Phẩm'}</h2>
-                <button className={styles.modalCloseBtn} onClick={() => setShowModal(false)}>✕</button>
-              </div>
-              <div className={styles.modalBody}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  {/* Cột trái */}
-                  <div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>Tên Sản Phẩm *</label>
-                      <input 
-                        type="text" 
-                        className={styles.formInput} 
-                        value={formData.name} 
-                        onChange={e => setFormData({...formData, name: e.target.value})} 
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>Giá (VNĐ) *</label>
-                      <input 
-                        type="number" 
-                        className={styles.formInput} 
-                        value={formData.price} 
-                        onChange={e => setFormData({...formData, price: e.target.value})} 
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>Số lượng Tồn kho *</label>
-                      <input 
-                        type="number" 
-                        className={styles.formInput} 
-                        value={formData.stock} 
-                        onChange={e => setFormData({...formData, stock: e.target.value})} 
-                      />
-                    </div>
-                  </div>
-
-                  {/* Cột phải */}
-                  <div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>Danh Mục</label>
-                      <select 
-                        className={styles.formInput} 
-                        value={formData.category} 
-                        onChange={e => setFormData({...formData, category: e.target.value})}
-                      >
-                        <option value="">-- Chọn danh mục --</option>
-                        {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
-                      </select>
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>Nhà Cung Cấp</label>
-                      <select 
-                        className={styles.formInput} 
-                        value={formData.supplier} 
-                        onChange={e => setFormData({...formData, supplier: e.target.value})}
-                      >
-                        <option value="">-- Chọn NCC --</option>
-                        {suppliers.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
-                      </select>
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>Hình Ảnh</label>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        className={styles.formInput} 
-                        onChange={handleFileChange} 
-                      />
-                      {imagePreview && (
-                        <img 
-                          src={imagePreview} 
-                          alt="Preview" 
-                          style={{ marginTop: '0.5rem', width: '100%', height: '100px', objectFit: 'contain', borderRadius: '4px', border: '1px solid #e2e8f0' }} 
-                        />
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Mô Tả</label>
-                  <textarea 
-                    className={styles.formInput} 
-                    rows="3" 
-                    value={formData.description} 
-                    onChange={e => setFormData({...formData, description: e.target.value})}
-                  ></textarea>
-                </div>
-              </div>
-              <div className={styles.modalFooter}>
-                <button className={`${styles.modalFooterBtn} ${styles.modalFooterBtnCancel}`} onClick={() => setShowModal(false)}>Hủy</button>
-                <button className={`${styles.modalFooterBtn} ${styles.modalFooterBtnSubmit}`} onClick={handleSubmit}>Lưu</button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ProductModal
+          show={showModal}
+          isEditMode={isEditMode}
+          formData={formData}
+          setFormData={setFormData}
+          categories={categories}
+          suppliers={suppliers}
+          imagePreview={imagePreview}
+          handleFileChange={handleFileChange}
+          onSubmit={handleSubmit}
+          onClose={() => setShowModal(false)}
+        />
       </main>
     </div>
   );
