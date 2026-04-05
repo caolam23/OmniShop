@@ -4,7 +4,8 @@ export default function ProductTable({
   loading,
   products,
   handleEdit,
-  handleDelete
+  handleDelete,
+  handleRestore
 }) {
   if (loading) {
     return <div className={styles.loadingContainer}><div className={styles.spinner}></div></div>;
@@ -25,8 +26,8 @@ export default function ProductTable({
         </thead>
         <tbody className={styles.tableBody}>
           {products.length > 0 ? products.map(p => (
-            <tr key={p._id}>
-              <td className={styles.tableCell}>
+            <tr key={p._id} className={p.isDeleted ? styles.deletedRow : ''}>
+              <td className={`${styles.tableCell} ${p.isDeleted ? styles.tableCellDeleted : ''}`}>
                 {p.image ? (
                   <img 
                     src={`http://localhost:3000${p.image}`} 
@@ -37,25 +38,35 @@ export default function ProductTable({
                   <div style={{ width: '50px', height: '50px', backgroundColor: '#e2e8f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>No Img</div>
                 )}
               </td>
-              <td className={styles.tableCell}>
+              <td className={`${styles.tableCell} ${p.isDeleted ? styles.tableCellDeleted : ''}`}>
                 {/* Gạch ngang nếu SP bị xóa mềm */}
                 <span style={{ textDecoration: p.isDeleted ? 'line-through' : 'none', fontWeight: 500 }}>
                   {p.name}
                 </span>
               </td>
-              <td className={styles.tableCell}>
+              <td className={`${styles.tableCell} ${p.isDeleted ? styles.tableCellDeleted : ''}`}>
                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price)}
               </td>
               <td className={styles.tableCell}>
-                <span className={`${styles.badge} ${p.stock > 0 ? styles.badgeSuccess : styles.badgeWarning}`}>
-                  {p.stock}
-                </span>
+                {p.isDeleted ? (
+                  <span className={`${styles.badge} ${styles.badgeDanger}`}>Đã xóa</span>
+                ) : (
+                  <span className={`${styles.badge} ${p.stock > 0 ? styles.badgeSuccess : styles.badgeWarning}`}>
+                    {p.stock}
+                  </span>
+                )}
               </td>
-              <td className={styles.tableCell}>{p.category?.name || '--'}</td>
+              <td className={`${styles.tableCell} ${p.isDeleted ? styles.tableCellDeleted : ''}`}>{p.category?.name || '--'}</td>
               <td className={styles.tableCell}>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button className={styles.btnSmall} style={{ backgroundColor: '#3b82f6', color: 'white' }} onClick={() => handleEdit(p)}>Sửa</button>
-                  <button className={styles.btnSmall} style={{ backgroundColor: '#ef4444', color: 'white' }} onClick={() => handleDelete(p._id)}>Xóa</button>
+                  {p.isDeleted ? (
+                    <button className={`${styles.btnSmall} ${styles.btnRestore}`} onClick={() => handleRestore(p._id)}>Khôi phục</button>
+                  ) : (
+                    <>
+                      <button className={`${styles.btnSmall} ${styles.btnEdit}`} onClick={() => handleEdit(p)}>Sửa</button>
+                      <button className={`${styles.btnSmall} ${styles.btnDelete}`} onClick={() => handleDelete(p._id)}>Xóa</button>
+                    </>
+                  )}
                 </div>
               </td>
             </tr>

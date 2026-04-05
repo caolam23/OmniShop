@@ -79,7 +79,8 @@ export default function ProductManagement() {
         limit, 
         search, 
         sortBy, 
-        sortOrder 
+        sortOrder,
+        includeDeleted: true // Yêu cầu server trả về cả sản phẩm đã xóa mềm
       };
       if (filterCategory) params.category = filterCategory;
       if (filterSupplier) params.supplier = filterSupplier;
@@ -188,6 +189,20 @@ export default function ProductManagement() {
     }
   };
 
+  // Khôi phục sản phẩm
+  const handleRestore = async (id) => {
+    try {
+      const response = await productApi.restoreProduct(id);
+      if (response.success) {
+        setSuccess('Đã khôi phục sản phẩm!');
+        fetchProducts(); 
+        setTimeout(() => setSuccess(''), 3000);
+      }
+    } catch (err) {
+      setError(err?.message || 'Lỗi khi khôi phục');
+    }
+  };
+
   const handleLogout = async () => {
     await authApi.logout();
     navigate('/login');
@@ -291,6 +306,7 @@ export default function ProductManagement() {
           products={products} 
           handleEdit={handleEdit} 
           handleDelete={handleDelete} 
+          handleRestore={handleRestore}
         />
 
         {/* Phân trang */}

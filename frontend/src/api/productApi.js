@@ -20,6 +20,8 @@ const productApi = {
   }),
   
   deleteProduct: (id) => axiosClient.delete(`/products/${id}`),
+
+  restoreProduct: (id) => axiosClient.patch(`/products/${id}/restore`),
 };
 
 export default productApi;

@@ -13,9 +13,15 @@ exports.getAllProducts = async (req, res, next) => {
     const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     const category = req.query.category;
     const supplier = req.query.supplier;
+    const includeDeleted = req.query.includeDeleted === 'true';
     
-    // 2. Xây dựng Query tìm kiếm (chỉ lấy SP chưa bị xóa mềm)
-    const query = { isDeleted: { $ne: true } };
+    // 2. Xây dựng Query tìm kiếm
+    const query = {};
+    
+    // Nếu không có cờ includeDeleted (dành cho HomePage) thì ẩn sản phẩm đã xóa
+    if (!includeDeleted) {
+      query.isDeleted = { $ne: true };
+    }
     
     if (search) {
       query.$or = [
@@ -37,6 +43,7 @@ exports.getAllProducts = async (req, res, next) => {
     
     const total = await Product.countDocuments(query);
     const products = await Product.find(query)
+      .select('+isDeleted') // Ép Mongoose trả về trường isDeleted vốn bị ẩn (select: false)
       .populate('category', 'name')
       .populate('supplier', 'name')
       .sort(sortObj)
@@ -53,6 +60,25 @@ exports.getAllProducts = async (req, res, next) => {
         totalPages: Math.ceil(total / limit)
       }
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @route   PATCH /api/v1/products/:id/restore
+// @desc    Khôi phục sản phẩm đã bị xóa mềm
+// @access  Private/Admin
+exports.restoreProduct = async (req, res, next) => {
+  try {
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { isDeleted: false },
+      { new: true }
+    );
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Sản phẩm không tồn tại' });
+    }
+    res.status(200).json({ success: true, message: 'Đã khôi phục sản phẩm thành công' });
   } catch (error) {
     next(error);
   }

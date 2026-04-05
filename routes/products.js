@@ -8,5 +8,6 @@ router.get('/:id', productController.getProductById);
 router.post('/', upload.single('image'), productController.createProduct); // Bắt file 'image'
 router.put('/:id', upload.single('image'), productController.updateProduct); // Cập nhật cũng có thể đổi ảnh
 router.delete('/:id', productController.deleteProduct);
+router.patch('/:id/restore', productController.restoreProduct);
 
 module.exports = router;
