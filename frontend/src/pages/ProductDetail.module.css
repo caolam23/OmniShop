@@ -1,0 +1,269 @@
+/* CSS Reset & Variables */
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --bg-body: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
+
+.pageContainer {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-body);
+  min-height: 100vh;
+  color: var(--text-main);
+}
+
+/* Sao chép Navbar từ HomePage */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 6%;
+  background-color: var(--bg-surface);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.navLinks { display: flex; align-items: center; gap: 1.5rem; }
+.link { text-decoration: none; color: var(--text-muted); font-weight: 500; transition: color 0.2s; }
+.link:hover { color: var(--primary); }
+.userInfo { display: flex; align-items: center; gap: 1.5rem; padding-right: 1.5rem; border-right: 1px solid var(--border-color); }
+.userName { color: var(--text-main); font-size: 0.95rem; }
+.userName a { color: var(--primary); text-decoration: none; transition: color 0.2s; }
+.userName a:hover { color: var(--primary-hover); }
+.cartIconWrapper { position: relative; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; }
+.cartIconWrapper:hover { color: var(--primary); }
+.cartBadge { position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+
+.mainContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.backLink {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 2rem;
+  transition: color 0.2s;
+}
+
+.backLink:hover {
+  color: var(--primary);
+}
+
+.productDetailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  background: var(--bg-surface);
+  padding: 2.5rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.imageSection {
+  background: #f1f5f9;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.imageSection img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.noImage {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.headerInfo {
+  margin-bottom: 0.5rem;
+}
+
+.categoryLabel {
+  font-size: 0.9rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.productName {
+  font-size: 2.5rem;
+  color: var(--text-main);
+  font-weight: 800;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.productPrice {
+  font-size: 2rem;
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.stockStatus {
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.inStock { color: #10b981; }
+.outOfStock { color: #ef4444; }
+
+.divider {
+  border: none;
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 1.5rem 0;
+}
+
+.descriptionBox {
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.descriptionBox h3 {
+  color: var(--text-main);
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.descriptionBox p {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.supplierBox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.supplierBox strong {
+  color: var(--text-main);
+}
+
+.actionWrapper {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.actionSection {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.quantityControl {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.quantityControl button {
+  background: var(--bg-surface);
+  border: none;
+  padding: 0.8rem 1.2rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: background 0.2s;
+}
+
+.quantityControl button:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.quantityControl button:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.quantityControl input {
+  width: 60px;
+  text-align: center;
+  border: none;
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  font-size: 1.1rem;
+  padding: 0.8rem 0;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.addToCartBtn {
+  flex: 1;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.addToCartBtn:hover:not(:disabled) { background-color: var(--primary-hover); }
+.addToCartBtn:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+
+.loadingContainer, .errorContainer { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 1rem; }
+.spinner { border: 4px solid #e2e8f0; border-top: 4px solid var(--primary); border-radius: 50%; width: 3rem; height: 3rem; animation: spin 0.8s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.backBtn { padding: 0.8rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 500; }

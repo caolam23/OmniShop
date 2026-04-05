@@ -1,100 +1,88 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authApi from '../api/authApi';
+import NavBar from '../components/Navbar';
 import styles from './UserProfile.module.css';
-
-// Utility function to truncate long names
-const truncateName = (name, maxLength = 20) => {
-  if (!name) return '';
-  return name.length > maxLength ? name.substring(0, maxLength) + '...' : name;
-};
 
 export default function UserProfile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get user from localStorage or fetch from API
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        const userData = JSON.parse(userStr);
-        setUser(userData);
-      } catch (err) {
-        console.error('Error parsing user:', err);
-      }
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      navigate('/login');
     }
-    setLoading(false);
-  }, []);
+  }, [navigate]);
 
-  const handleLogout = () => {
-    authApi.logout();
-    navigate('/login');
-  };
-
-  if (loading) {
-    return <div className={styles.loadingContainer}>Đang tải...</div>;
-  }
-
-  if (!user) {
-    return <div className={styles.errorContainer}>Không tìm thấy thông tin người dùng</div>;
-  }
-
-  const displayName = truncateName(user.fullName || user.name || user.email);
+  if (!user) return null;
 
   return (
-    <div className={styles.userProfileContainer}>
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.logo}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <path d="M16 10a4 4 0 0 1-8 0"></path>
-            </svg>
-            OmniShop
-          </div>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
-            Đăng xuất
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className={styles.mainContent}>
-        <div className={styles.welcomeCard}>
-          {/* Greeting Section */}
-          <div className={styles.greetingSection}>
-            <h1 className={styles.greeting}>Xin chào, {displayName}! 👋</h1>
-            <p className={styles.subGreeting}>Chào mừng bạn trở lại</p>
-          </div>
-
-          {/* User Info Section */}
-          <div className={styles.userInfoSection}>
-            <div className={styles.userAvatar}>
-              <span className={styles.avatarInitial}>
-                {displayName.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <div className={styles.userDetails}>
-              <div className={styles.detailRow}>
-                <span className={styles.label}>Tên:</span>
-                <span className={styles.value}>{user.fullName || user.name || 'N/A'}</span>
+    <div className={styles.pageContainer}>
+      <NavBar />
+      
+      <div className={styles.profileWrapper}>
+          {/* Cột trái: Avatar & Thông tin ngắn gọn */}
+          <div className={styles.card} style={{ height: 'fit-content' }}>
+            <div className={styles.avatarContainer}>
+              <div className={styles.avatar}>
+                {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
               </div>
-              <div className={styles.detailRow}>
-                <span className={styles.label}>Email:</span>
-                <span className={styles.value}>{user.email || 'N/A'}</span>
-              </div>
-              <div className={styles.detailRow}>
-                <span className={styles.label}>Vai trò:</span>
-                <span className={styles.value}>{user.role?.name || user.role || 'User'}</span>
+              <h4 className={styles.userName}>{user.username}</h4>
+              <p className={styles.userEmail}>{user.email}</p>
+              <div>
+                <span className={styles.roleBadge}>
+                  {user.role?.name || user.role || 'Khách hàng'}
+                </span>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+
+          {/* Cột phải: Chi tiết thông tin & Lịch sử */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Card Thông tin cá nhân */}
+            <div className={styles.card}>
+              <h5 className={styles.sectionTitle}>Thông tin cá nhân</h5>
+              <form>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Tên hiển thị</label>
+                  <input type="text" className={styles.formInput} value={user.username} readOnly />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Địa chỉ Email</label>
+                  <input type="email" className={styles.formInput} value={user.email} readOnly />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Mật khẩu</label>
+                  <input type="password" className={styles.formInput} value="********" readOnly />
+                </div>
+                <button 
+                  type="button" 
+                  className={styles.btnPrimary}
+                  onClick={() => alert('Tính năng cập nhật thông tin đang được phát triển!')}
+                >
+                  Cập nhật thông tin
+                </button>
+              </form>
+            </div>
+
+            {/* Card Lịch sử đơn hàng */}
+            <div className={styles.card}>
+              <h5 className={styles.sectionTitle}>Lịch sử đơn hàng</h5>
+              <div className={styles.emptyState}>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <p>Bạn chưa có đơn hàng nào trong hệ thống.</p>
+                <button className={styles.btnOutline} onClick={() => navigate('/shop')}>Khám phá sản phẩm ngay</button>
+              </div>
+            </div>
+          </div>
+      </div>
     </div>
   );
 }

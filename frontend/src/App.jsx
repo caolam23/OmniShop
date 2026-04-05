@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage';
 import ProductManagement from './pages/ProductManagement';
 import CategoryManagement from './pages/CategoryManagement';
 import SupplierManagement from './pages/SupplierManagement';
+import ProductDetail from './pages/ProductDetail';
 import './App.css';
 
 // Protected Route Component - Check token and optional role
@@ -71,6 +72,7 @@ export default function App() {
       <Routes>
         {/* Public Shop Route */}
         <Route path="/shop" element={<HomePage />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
         
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
