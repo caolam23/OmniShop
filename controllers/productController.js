@@ -1,11 +1,9 @@
 const Product = require('../models/Product');
 
-// @route   GET /api/v1/products
-// @desc    Lấy danh sách products có phân trang, tìm kiếm, sắp xếp
-// @access  Public
+
 exports.getAllProducts = async (req, res, next) => {
   try {
-    // 1. Nhận query params
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || '';
@@ -15,10 +13,8 @@ exports.getAllProducts = async (req, res, next) => {
     const supplier = req.query.supplier;
     const includeDeleted = req.query.includeDeleted === 'true';
     
-    // 2. Xây dựng Query tìm kiếm
     const query = {};
     
-    // Nếu không có cờ includeDeleted (dành cho HomePage) thì ẩn sản phẩm đã xóa
     if (!includeDeleted) {
       query.isDeleted = { $ne: true };
     }
@@ -37,13 +33,12 @@ exports.getAllProducts = async (req, res, next) => {
       query.supplier = supplier;
     }
     
-    // 3. Tính toán phân trang và sắp xếp
     const skip = (page - 1) * limit;
     const sortObj = { [sortBy]: sortOrder };
     
     const total = await Product.countDocuments(query);
     const products = await Product.find(query)
-      .select('+isDeleted') // Ép Mongoose trả về trường isDeleted vốn bị ẩn (select: false)
+      .select('+isDeleted') 
       .populate('category', 'name')
       .populate('supplier', 'name')
       .sort(sortObj)
@@ -65,9 +60,7 @@ exports.getAllProducts = async (req, res, next) => {
   }
 };
 
-// @route   PATCH /api/v1/products/:id/restore
-// @desc    Khôi phục sản phẩm đã bị xóa mềm
-// @access  Private/Admin
+
 exports.restoreProduct = async (req, res, next) => {
   try {
     const product = await Product.findByIdAndUpdate(
@@ -84,8 +77,7 @@ exports.restoreProduct = async (req, res, next) => {
   }
 };
 
-// @route   GET /api/v1/products/:id
-// @access  Public
+
 exports.getProductById = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id)
@@ -101,15 +93,12 @@ exports.getProductById = async (req, res, next) => {
   }
 };
 
-// @route   POST /api/v1/products
-// @desc    Tạo product mới (Có xử lý file ảnh)
-// @access  Private/Admin
+
 exports.createProduct = async (req, res, next) => {
   try {
     const { name, description, price, stock, category, supplier } = req.body;
     let imagePath = '';
     
-    // Nếu có file upload từ multer
     if (req.file) {
       imagePath = `/uploads/products/${req.file.filename}`;
     }
@@ -121,7 +110,7 @@ exports.createProduct = async (req, res, next) => {
       stock,
       category,
       supplier,
-      image: imagePath || req.body.image // Ưu tiên file upload, sau đó là link ngoài (nếu có)
+      image: imagePath || req.body.image 
     });
     
     await product.save();
@@ -131,14 +120,10 @@ exports.createProduct = async (req, res, next) => {
   }
 };
 
-// @route   PUT /api/v1/products/:id
-// @desc    Cập nhật product (Có xử lý file ảnh)
-// @access  Private/Admin
 exports.updateProduct = async (req, res, next) => {
   try {
     const updateData = { ...req.body };
     
-    // Nếu có upload ảnh mới thì cập nhật đường dẫn ảnh
     if (req.file) {
       updateData.image = `/uploads/products/${req.file.filename}`;
     }
@@ -158,9 +143,6 @@ exports.updateProduct = async (req, res, next) => {
   }
 };
 
-// @route   DELETE /api/v1/products/:id
-// @desc    Xóa mềm product
-// @access  Private/Admin
 exports.deleteProduct = async (req, res, next) => {
   try {
     const product = await Product.findByIdAndUpdate(

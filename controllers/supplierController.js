@@ -1,6 +1,5 @@
 const Supplier = require('../models/Supplier');
 
-// Lấy tất cả nhà cung cấp (chưa bị xóa)
 exports.getAllSuppliers = async (req, res, next) => {
   try {
     const suppliers = await Supplier.find({ isDeleted: { $ne: true } });
@@ -10,7 +9,6 @@ exports.getAllSuppliers = async (req, res, next) => {
   }
 };
 
-// Lấy chi tiết
 exports.getSupplierById = async (req, res, next) => {
   try {
     const supplier = await Supplier.findById(req.params.id);
@@ -23,7 +21,6 @@ exports.getSupplierById = async (req, res, next) => {
   }
 };
 
-// Tạo mới
 exports.createSupplier = async (req, res, next) => {
   try {
     const supplier = new Supplier(req.body);
@@ -34,7 +31,6 @@ exports.createSupplier = async (req, res, next) => {
   }
 };
 
-// Cập nhật
 exports.updateSupplier = async (req, res, next) => {
   try {
     const supplier = await Supplier.findByIdAndUpdate(
@@ -51,7 +47,6 @@ exports.updateSupplier = async (req, res, next) => {
   }
 };
 
-// Xóa mềm (Soft Delete)
 exports.deleteSupplier = async (req, res, next) => {
   try {
     const supplier = await Supplier.findByIdAndUpdate(

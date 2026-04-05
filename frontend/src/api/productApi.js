@@ -1,12 +1,11 @@
 import axiosClient from './axiosClient';
 
 const productApi = {
-  // params có thể chứa: { page, limit, search, sortBy, sortOrder }
+
   getAllProducts: (params) => axiosClient.get('/products', { params }),
   
   getProductById: (id) => axiosClient.get(`/products/${id}`),
   
-  // data ở đây phải là một object FormData (vì có file ảnh)
   createProduct: (formData) => axiosClient.post('/products', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',

@@ -1,6 +1,5 @@
 const Category = require('../models/Category');
 
-// Lấy tất cả danh mục (chưa bị xóa)
 exports.getAllCategories = async (req, res, next) => {
   try {
     const categories = await Category.find({ isDeleted: { $ne: true } });
@@ -10,7 +9,6 @@ exports.getAllCategories = async (req, res, next) => {
   }
 };
 
-// Lấy chi tiết 1 danh mục
 exports.getCategoryById = async (req, res, next) => {
   try {
     const category = await Category.findById(req.params.id);
@@ -23,12 +21,11 @@ exports.getCategoryById = async (req, res, next) => {
   }
 };
 
-// Tạo mới
+
 exports.createCategory = async (req, res, next) => {
   try {
     const categoryData = { ...req.body };
     
-    // Nếu có file upload từ multer
     if (req.file) {
       categoryData.image = `/uploads/products/${req.file.filename}`; 
     }
@@ -41,12 +38,10 @@ exports.createCategory = async (req, res, next) => {
   }
 };
 
-// Cập nhật
 exports.updateCategory = async (req, res, next) => {
   try {
     const updateData = { ...req.body };
     
-    // Cập nhật ảnh nếu có file gửi lên
     if (req.file) {
       updateData.image = `/uploads/products/${req.file.filename}`;
     }
@@ -65,7 +60,6 @@ exports.updateCategory = async (req, res, next) => {
   }
 };
 
-// Xóa mềm (Soft Delete)
 exports.deleteCategory = async (req, res, next) => {
   try {
     const category = await Category.findByIdAndUpdate(
