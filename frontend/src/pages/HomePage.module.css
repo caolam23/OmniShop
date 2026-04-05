@@ -90,6 +90,23 @@
   color: var(--primary-hover);
 }
 
+.logoutBtn {
+  background-color: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 0.35rem 0.875rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
 .cartIconWrapper {
   position: relative;
   cursor: pointer;

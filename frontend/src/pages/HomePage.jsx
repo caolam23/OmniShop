@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import productApi from '../api/productApi';
 import categoryApi from '../api/categoryApi';
+import authApi from '../api/authApi';
 import styles from './HomePage.module.css';
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -87,6 +89,12 @@ export default function HomePage() {
     alert(`Đã thêm "${product.name}" vào giỏ hàng!\n(Tính năng chi tiết do An Phong phát triển)`);
   };
 
+  const handleLogout = () => {
+    authApi.logout();
+    setUser(null);
+    navigate('/login');
+  };
+
   return (
     <div className={styles.homeContainer}>
       {/* Navbar Khách hàng */}
@@ -108,6 +116,9 @@ export default function HomePage() {
                 Xin chào,{' '}
                 <Link to="/user"><strong>{user.username}</strong></Link>
               </span>
+              <button className={styles.logoutBtn} onClick={handleLogout}>
+                Đăng xuất
+              </button>
             </div>
           ) : (
             <Link to="/login" className={styles.link}>Đăng nhập</Link>
