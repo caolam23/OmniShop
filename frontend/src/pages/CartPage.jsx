@@ -17,8 +17,13 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true);
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try { setUser(JSON.parse(userStr)); } catch (err) { console.error(err); }
+    }
     fetchCart();
   }, []);
 
@@ -82,18 +87,46 @@ export default function CartPage() {
   const total = Math.max(0, subtotal - discount);
 
   if (loading) return (
-    <div className={styles.loadingContainer}>
-      <div className={styles.spinner}></div>
-      <p>Đang tải giỏ hàng...</p>
+    <div className={styles.pageContainer}>
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <p>Đang tải giỏ hàng...</p>
+      </div>
     </div>
   );
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
+    <div className={styles.pageContainer}>
+      {/* Navbar đồng bộ với Project */}
+      <header className={styles.navbar}>
+        <Link to="/shop" className={styles.logoWrapper} style={{ textDecoration: 'none' }}>
+          <div className={styles.logo}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            OmniShop
+          </div>
+        </Link>
+        <nav className={styles.navLinks}>
+          <Link to="/shop" className={styles.link}>Trang chủ</Link>
+          <Link to="/cart" className={styles.link}>Giỏ hàng</Link>
+          {user ? (
+            <div className={styles.userInfo}>
+              <span className={styles.userName}>
+                Xin chào, <Link to="/user"><strong>{user.username}</strong></Link>
+              </span>
+            </div>
+          ) : (
+            <Link to="/login" className={styles.link}>Đăng nhập</Link>
+          )}
+        </nav>
+      </header>
+
+      <main className={styles.mainContent}>
         <Link to="/shop" className={styles.backBtn}>← Tiếp tục mua sắm</Link>
         <h1>Giỏ hàng của bạn</h1>
-      </header>
 
       {!cart || cart.products.length === 0 ? (
         <div className={styles.emptyCart}>
@@ -186,6 +219,7 @@ export default function CartPage() {
           </aside>
         </div>
       )}
+      </main>
     </div>
   );
 }
