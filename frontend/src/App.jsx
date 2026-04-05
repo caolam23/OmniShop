@@ -6,6 +6,7 @@ import UserProfile from './pages/UserProfile';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import RoleManagement from './pages/RoleManagement';
+import CouponManagement from './pages/CouponManagement';
 import HomePage from './pages/HomePage';
 import ProductManagement from './pages/ProductManagement';
 import CategoryManagement from './pages/CategoryManagement';
@@ -124,6 +125,15 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['Admin']}>
               <RoleManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/coupons"
+          element={
+            <ProtectedRoute allowedRoles={['Admin']}>
+              <CouponManagement />
             </ProtectedRoute>
           }
         />

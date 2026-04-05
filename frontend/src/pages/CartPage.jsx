@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import cartApi from '../api/cartApi';
+import couponApi from '../api/couponApi';
 import styles from './CartPage.module.css';
 
 // Hằng số cấu hình
@@ -16,7 +17,7 @@ export default function CartPage() {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [coupon, setCoupon] = useState('');
-  const [discount, setDiscount] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -65,14 +66,17 @@ export default function CartPage() {
     }
   };
 
-  const handleApplyCoupon = () => {
-    // Giả lập logic mã giảm giá (Bạn có thể viết thêm API Coupon sau)
-    if (coupon.toUpperCase() === 'OMNISHOP') {
-      setDiscount(50000); // Giảm thẳng 50k
-      alert('Áp dụng mã giảm giá thành công!');
-    } else {
-      alert('Mã giảm giá không hợp lệ');
-      setDiscount(0);
+  const handleApplyCoupon = async () => {
+    if (!coupon) return;
+    try {
+      const res = await couponApi.validateCoupon({ code: coupon, orderValue: subtotal });
+      if (res.success) {
+        setAppliedCoupon(res.data);
+        alert('Áp dụng mã giảm giá thành công!');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Lỗi khi áp dụng mã');
+      setAppliedCoupon(null);
     }
   };
 
@@ -83,8 +87,17 @@ export default function CartPage() {
     }, 0);
   };
 
+  const calculateDiscount = (subtotalValue) => {
+    if (!appliedCoupon) return 0;
+    if (appliedCoupon.discountType === 'percentage') {
+      return (subtotalValue * appliedCoupon.discountValue) / 100;
+    }
+    return appliedCoupon.discountValue;
+  };
+
   const subtotal = calculateSubtotal();
-  const total = Math.max(0, subtotal - discount);
+  const discountAmount = calculateDiscount(subtotal);
+  const total = Math.max(0, subtotal - discountAmount);
 
   if (loading) return (
     <div className={styles.pageContainer}>
@@ -201,10 +214,11 @@ export default function CartPage() {
               <span>Tạm tính:</span>
               <span>{formatVND(subtotal)}</span>
             </div>
-            {discount > 0 && (
+            {appliedCoupon && (
               <div className={`${styles.summaryRow} ${styles.discount}`}>
-                <span>Giảm giá:</span>
-                <span>-{formatVND(discount)}</span>
+                <span>Giảm giá ({appliedCoupon.code}):</span>
+                <span>-{formatVND(discountAmount)}</span>
+                <button className={styles.removeCoupon} onClick={() => {setAppliedCoupon(null); setCoupon('');}}>✕</button>
               </div>
             )}
             <hr />
