@@ -3,6 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import cartApi from '../api/cartApi';
 import styles from './CartPage.module.css';
 
+// Hằng số cấu hình
+const IMAGE_BASE_URL = 'http://localhost:3000';
+
+// Helper format tiền tệ VND
+const formatVND = (amount) => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+};
+
 export default function CartPage() {
   const navigate = useNavigate();
   const [cart, setCart] = useState(null);
@@ -73,7 +81,12 @@ export default function CartPage() {
   const subtotal = calculateSubtotal();
   const total = Math.max(0, subtotal - discount);
 
-  if (loading) return <div className={styles.loader}>Đang tải giỏ hàng...</div>;
+  if (loading) return (
+    <div className={styles.loadingContainer}>
+      <div className={styles.spinner}></div>
+      <p>Đang tải giỏ hàng...</p>
+    </div>
+  );
 
   return (
     <div className={styles.container}>
@@ -84,7 +97,14 @@ export default function CartPage() {
 
       {!cart || cart.products.length === 0 ? (
         <div className={styles.emptyCart}>
-          <p>Giỏ hàng đang trống.</p>
+          <div className={styles.emptyIcon}>
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+          </div>
+          <p>Giỏ hàng của bạn còn trống</p>
           <Link to="/shop" className={styles.shopNowBtn}>Mua sắm ngay</Link>
         </div>
       ) : (
@@ -92,26 +112,37 @@ export default function CartPage() {
           <div className={styles.itemList}>
             {cart.products.map((item) => (
               <div key={item.product._id} className={styles.cartItem}>
-                <img 
-                  src={item.product.image ? `http://localhost:3000${item.product.image}` : '/placeholder.png'} 
-                  alt={item.product.name} 
-                  className={styles.itemImage}
-                />
+                <Link to={`/product/${item.product._id}`} className={styles.imageWrapper}>
+                  <img 
+                    src={item.product.image ? `${IMAGE_BASE_URL}${item.product.image}` : '/placeholder.png'} 
+                    alt={item.product.name} 
+                    className={styles.itemImage}
+                  />
+                </Link>
                 <div className={styles.itemInfo}>
-                  <h3>{item.product.name}</h3>
-                  <p className={styles.itemPrice}>
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.product.price)}
-                  </p>
+                  <Link to={`/product/${item.product._id}`} className={styles.itemName}>
+                    <h3>{item.product.name}</h3>
+                  </Link>
+                  <p className={styles.itemPrice}>{formatVND(item.product.price)}</p>
+                  
+                  <div className={styles.mobileActions}>
+                    <div className={styles.quantityControls}>
+                      <button onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)} disabled={item.quantity <= 1}>-</button>
+                      <input type="text" value={item.quantity} readOnly />
+                      <button onClick={() => handleUpdateQuantity(item.product._id, item.quantity + 1)}>+</button>
+                    </div>
+                    <button className={styles.removeBtnMobile} onClick={() => handleRemoveItem(item.product._id)}>Xóa</button>
+                  </div>
                 </div>
-                <div className={styles.quantityControls}>
-                  <button onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)}>-</button>
-                  <span>{item.quantity}</span>
+                <div className={`${styles.quantityControls} ${styles.desktopOnly}`}>
+                  <button onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)} disabled={item.quantity <= 1}>-</button>
+                  <input type="text" value={item.quantity} readOnly />
                   <button onClick={() => handleUpdateQuantity(item.product._id, item.quantity + 1)}>+</button>
                 </div>
-                <div className={styles.itemTotal}>
-                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.product.price * item.quantity)}
+                <div className={`${styles.itemTotal} ${styles.desktopOnly}`}>
+                  {formatVND(item.product.price * item.quantity)}
                 </div>
-                <button className={styles.removeBtn} onClick={() => handleRemoveItem(item.product._id)}>
+                <button className={`${styles.removeBtn} ${styles.desktopOnly}`} onClick={() => handleRemoveItem(item.product._id)}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                   </svg>
@@ -135,18 +166,18 @@ export default function CartPage() {
 
             <div className={styles.summaryRow}>
               <span>Tạm tính:</span>
-              <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(subtotal)}</span>
+              <span>{formatVND(subtotal)}</span>
             </div>
             {discount > 0 && (
               <div className={`${styles.summaryRow} ${styles.discount}`}>
                 <span>Giảm giá:</span>
-                <span>-{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discount)}</span>
+                <span>-{formatVND(discount)}</span>
               </div>
             )}
             <hr />
             <div className={`${styles.summaryRow} ${styles.total}`}>
               <span>Tổng cộng:</span>
-              <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total)}</span>
+              <span className={styles.totalAmount}>{formatVND(total)}</span>
             </div>
 
             <button className={styles.checkoutBtn} onClick={() => alert('Hệ thống đang chuyển sang trang thanh toán!')}>

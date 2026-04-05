@@ -6,6 +6,14 @@ import authApi from '../api/authApi';
 import cartApi from '../api/cartApi';
 import styles from './HomePage.module.css';
 
+// Hằng số cấu hình (Nên đưa vào file config riêng nếu có thể)
+const IMAGE_BASE_URL = 'http://localhost:3000';
+
+// Helper format tiền tệ VND
+const formatVND = (amount) => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+};
+
 export default function HomePage() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
@@ -229,7 +237,7 @@ export default function HomePage() {
               <div key={product._id} className={styles.productCard}>
                 <Link to={`/product/${product._id}`} className={styles.imageContainer}>
                   {product.image ? (
-                    <img src={`http://localhost:3000${product.image}`} alt={product.name} loading="lazy" />
+                    <img src={`${IMAGE_BASE_URL}${product.image}`} alt={product.name} loading="lazy" />
                   ) : (
                     <div className={styles.noImage}>
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
@@ -246,9 +254,7 @@ export default function HomePage() {
                   <Link to={`/product/${product._id}`} style={{ textDecoration: 'none' }}>
                     <h3 className={styles.productName} title={product.name}>{product.name}</h3>
                   </Link>
-                  <p className={styles.productPrice}>
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
-                  </p>
+                  <p className={styles.productPrice}>{formatVND(product.price)}</p>
                   <button 
                     className={styles.addToCartBtn} 
                     onClick={() => handleAddToCart(product)}
