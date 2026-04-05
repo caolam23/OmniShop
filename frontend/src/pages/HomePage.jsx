@@ -13,12 +13,11 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [cartCount, setCartCount] = useState(0); // Mock số lượng giỏ hàng
-  const [sortOption, setSortOption] = useState('newest'); // Trạng thái sắp xếp
+  const [cartCount, setCartCount] = useState(0); 
+  const [sortOption, setSortOption] = useState('newest'); 
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Lấy thông tin user từ localStorage nếu đã đăng nhập
     const userStr = localStorage.getItem('user');
     if (userStr) {
       try {
@@ -53,16 +52,12 @@ export default function HomePage() {
     fetchInitialData();
   }, []);
 
-  // Xử lý lọc theo Tên, Danh mục và Sắp xếp
-  useEffect(() => {
-    let result = [...products]; // Tạo bản sao để sắp xếp an toàn
 
-    // 1. Lọc theo danh mục trước
+  useEffect(() => {
+    let result = [...products]; 
     if (selectedCategory !== '') {
       result = result.filter(p => p.category?._id === selectedCategory || p.category === selectedCategory);
     }
-
-    // 2. Lọc theo tên tìm kiếm
     if (searchTerm.trim() !== '') {
       const lowerCaseSearch = searchTerm.toLowerCase();
       result = result.filter(p => 
@@ -160,20 +155,42 @@ export default function HomePage() {
         {/* Bộ lọc Danh mục */}
         {!loading && categories.length > 0 && (
           <div className={styles.categoryFilter}>
-            <button 
-              className={`${styles.categoryChip} ${selectedCategory === '' ? styles.activeChip : ''}`}
+            {/* Nút "Tất cả" */}
+            <div 
+              className={`${styles.categoryItem} ${selectedCategory === '' ? styles.activeCategory : ''}`}
               onClick={() => setSelectedCategory('')}
             >
-              Tất cả
-            </button>
+              <div className={styles.categoryImageWrapper}>
+                <div className={styles.categoryPlaceholder}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                </div>
+              </div>
+              <span className={styles.categoryName}>Tất cả</span>
+            </div>
+            
+            {/* Danh sách các danh mục có hình ảnh */}
             {categories.map(cat => (
-              <button 
+              <div 
                 key={cat._id}
-                className={`${styles.categoryChip} ${selectedCategory === cat._id ? styles.activeChip : ''}`}
+                className={`${styles.categoryItem} ${selectedCategory === cat._id ? styles.activeCategory : ''}`}
                 onClick={() => setSelectedCategory(cat._id)}
               >
-                {cat.name}
-              </button>
+                <div className={styles.categoryImageWrapper}>
+                  {cat.image ? (
+                    <img src={`http://localhost:3000${cat.image}`} alt={cat.name} className={styles.categoryImg} loading="lazy" />
+                  ) : (
+                    <div className={styles.categoryPlaceholder}>
+                      {cat.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <span className={styles.categoryName}>{cat.name}</span>
+              </div>
             ))}
           </div>
         )}

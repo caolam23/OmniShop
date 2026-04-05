@@ -9,6 +9,9 @@ const categorySchema = new mongoose.Schema({
   description: {
     type: String
   },
+  image: {
+    type: String // Đường dẫn logo/hình ảnh danh mục
+  },
   isDeleted: { type: Boolean, default: false, select: false }
 }, { timestamps: true });
 

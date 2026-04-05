@@ -26,7 +26,14 @@ exports.getCategoryById = async (req, res, next) => {
 // Tạo mới
 exports.createCategory = async (req, res, next) => {
   try {
-    const category = new Category(req.body);
+    const categoryData = { ...req.body };
+    
+    // Nếu có file upload từ multer
+    if (req.file) {
+      categoryData.image = `/uploads/products/${req.file.filename}`; 
+    }
+
+    const category = new Category(categoryData);
     await category.save();
     res.status(201).json({ success: true, data: category, message: 'Tạo danh mục thành công' });
   } catch (error) {
@@ -37,9 +44,16 @@ exports.createCategory = async (req, res, next) => {
 // Cập nhật
 exports.updateCategory = async (req, res, next) => {
   try {
+    const updateData = { ...req.body };
+    
+    // Cập nhật ảnh nếu có file gửi lên
+    if (req.file) {
+      updateData.image = `/uploads/products/${req.file.filename}`;
+    }
+
     const category = await Category.findByIdAndUpdate(
       req.params.id, 
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
     if (!category) {

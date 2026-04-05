@@ -19,7 +19,8 @@ export default function CategoryManagement() {
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '' });
+  const [formData, setFormData] = useState({ name: '', description: '', image: null });
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     fetchCategories();
@@ -44,7 +45,8 @@ export default function CategoryManagement() {
 
   const handleAddNew = () => {
     setIsEditMode(false);
-    setFormData({ name: '', description: '' });
+    setFormData({ name: '', description: '', image: null });
+    setImagePreview(null);
     setShowModal(true);
   };
 
@@ -54,8 +56,18 @@ export default function CategoryManagement() {
     setFormData({
       name: category.name,
       description: category.description || '',
+      image: null
     });
+    setImagePreview(category.image ? `http://localhost:3000${category.image}` : null);
     setShowModal(true);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setImagePreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async () => {
@@ -67,10 +79,18 @@ export default function CategoryManagement() {
     try {
       setError('');
       let response;
+      
+      const submitData = new FormData();
+      submitData.append('name', formData.name);
+      submitData.append('description', formData.description);
+      if (formData.image instanceof File) {
+        submitData.append('image', formData.image);
+      }
+
       if (isEditMode) {
-        response = await categoryApi.updateCategory(selectedCategory._id, formData);
+        response = await categoryApi.updateCategory(selectedCategory._id, submitData);
       } else {
-        response = await categoryApi.createCategory(formData);
+        response = await categoryApi.createCategory(submitData);
       }
 
       if (response.success) {
@@ -138,6 +158,7 @@ export default function CategoryManagement() {
             <table className={styles.table}>
               <thead className={styles.tableHead}>
                 <tr>
+                  <th className={styles.tableHeadCell}>Ảnh</th>
                   <th className={styles.tableHeadCell}>Tên Danh Mục</th>
                   <th className={styles.tableHeadCell}>Mô Tả</th>
                   <th className={styles.tableHeadCell}>Hành Động</th>
@@ -146,6 +167,17 @@ export default function CategoryManagement() {
               <tbody className={styles.tableBody}>
                 {paginatedCategories.length > 0 ? paginatedCategories.map(c => (
                   <tr key={c._id}>
+                    <td className={styles.tableCell}>
+                      {c.image ? (
+                        <img 
+                          src={`http://localhost:3000${c.image}`} 
+                          alt={c.name} 
+                          style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+                        />
+                      ) : (
+                        <div style={{ width: '40px', height: '40px', backgroundColor: '#e2e8f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>No Img</div>
+                      )}
+                    </td>
                     <td className={styles.tableCell}><strong>{c.name}</strong></td>
                     <td className={styles.tableCell}>{c.description || '--'}</td>
                     <td className={styles.tableCell}>
@@ -156,7 +188,7 @@ export default function CategoryManagement() {
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan="3" className={styles.noData}>Chưa có danh mục nào</td></tr>
+                  <tr><td colSpan="4" className={styles.noData}>Chưa có danh mục nào</td></tr>
                 )}
               </tbody>
             </table>
@@ -188,6 +220,17 @@ export default function CategoryManagement() {
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>Mô Tả</label>
                   <textarea className={styles.formInput} rows="3" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Logo / Hình Ảnh</label>
+                  <input type="file" accept="image/*" className={styles.formInput} onChange={handleFileChange} />
+                  {imagePreview && (
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      style={{ marginTop: '0.5rem', width: '100px', height: '100px', objectFit: 'contain', borderRadius: '4px', border: '1px solid #e2e8f0' }} 
+                    />
+                  )}
                 </div>
               </div>
               <div className={styles.modalFooter}>

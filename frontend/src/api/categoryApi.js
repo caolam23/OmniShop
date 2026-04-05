@@ -5,9 +5,17 @@ const categoryApi = {
   
   getCategoryById: (id) => axiosClient.get(`/categories/${id}`),
   
-  createCategory: (data) => axiosClient.post('/categories', data),
+  createCategory: (formData) => axiosClient.post('/categories', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   
-  updateCategory: (id, data) => axiosClient.put(`/categories/${id}`, data),
+  updateCategory: (id, formData) => axiosClient.put(`/categories/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   
   deleteCategory: (id) => axiosClient.delete(`/categories/${id}`),
 };
