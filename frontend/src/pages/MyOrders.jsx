@@ -25,6 +25,11 @@ export default function MyOrders() {
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
   const [selected, setSelected] = useState(null); // { order, details }
+  
+  // State phục vụ Checkout
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutData, setCheckoutData] = useState({ shippingAddress: '', note: '' });
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
     fetchMyOrders();
@@ -56,6 +61,54 @@ export default function MyOrders() {
 
   const formatDate = (dateStr) =>
     new Date(dateStr).toLocaleString('vi-VN');
+
+  const handleCheckout = async () => {
+    if (!checkoutData.shippingAddress.trim()) {
+      alert('Vui lòng nhập địa chỉ giao hàng!');
+      return;
+    }
+    
+    try {
+      setCheckoutLoading(true);
+
+      // Bước 1: Lấy 1 sản phẩm bất kỳ trong kho để làm mẫu (Vì team chưa làm trang Product/Cart)
+      const productsRes = await fetch('http://localhost:3000/api/v1/products', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      const productsData = await productsRes.json();
+      const sampleProduct = productsData.data?.[0] || productsData[0];
+      
+      if (sampleProduct) {
+        // Bước 2: Thêm tạm vào giỏ hàng
+        await fetch('http://localhost:3000/api/v1/carts/add', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}` 
+          },
+          body: JSON.stringify({ product: sampleProduct._id, quantity: 1 })
+        });
+      }
+
+      // BƯỚC 3: GỌI API CHECKOUT CỐT LÕI (YÊU CẦU ĐỒ ÁN)
+      const response = await orderApi.checkout({
+        shippingAddress: checkoutData.shippingAddress,
+        note: checkoutData.note
+      });
+
+      // Xử lý thông báo thành công
+      alert(`🎉 Đặt hàng thành công!\nMã đơn: ${response.order._id}`);
+      setShowCheckout(false);
+      setCheckoutData({ shippingAddress: '', note: '' });
+      fetchMyOrders(); // Load lại lịch sử
+
+    } catch (err) {
+      // Xử lý thông báo thất bại
+      alert(`❌ Lỗi đặt hàng: ${err?.message || 'Giỏ hàng trống hoặc thiếu hàng'}`);
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -99,11 +152,18 @@ export default function MyOrders() {
             <h1 className={styles.pageTitle}>Đơn hàng của tôi</h1>
             <p className={styles.pageSubtitle}>Lịch sử mua hàng</p>
           </div>
-          <button onClick={() => { localStorage.removeItem('token'); navigate('/login'); }}
-            style={{ background:'transparent', border:'1px solid #475569', color:'#94a3b8',
-              padding:'0.5rem 1rem', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem' }}>
-            Đăng xuất
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={() => setShowCheckout(true)}
+              style={{ background: '#4f46e5', color: 'white', border: 'none',
+                padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600 }}>
+              🛒 Đặt hàng mới (Test)
+            </button>
+            <button onClick={() => { localStorage.removeItem('token'); navigate('/login'); }}
+              style={{ background:'transparent', border:'1px solid #475569', color:'#94a3b8',
+                padding:'0.5rem 1rem', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem' }}>
+              Đăng xuất
+            </button>
+          </div>
         </div>
 
         {error   && <div className={`${styles.alert} ${styles.alertError}`}>{error}</div>}
@@ -196,6 +256,37 @@ export default function MyOrders() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Modal Đặt hàng (Checkout) */}
+      {showCheckout && (
+        <div className={styles.modalOverlay} onClick={() => setShowCheckout(false)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Tạo Đơn Hàng Mới</h2>
+              <button className={styles.modalClose} onClick={() => setShowCheckout(false)}>×</button>
+            </div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.25rem' }}>Địa chỉ giao hàng (*)</label>
+              <input type="text" value={checkoutData.shippingAddress} 
+                onChange={e => setCheckoutData({...checkoutData, shippingAddress: e.target.value})}
+                placeholder="Nhập địa chỉ..."
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+            </div>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', marginBottom: '0.25rem' }}>Ghi chú đơn hàng</label>
+              <textarea value={checkoutData.note} 
+                onChange={e => setCheckoutData({...checkoutData, note: e.target.value})}
+                placeholder="Lời nhắn cho shipper..."
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #e2e8f0', minHeight: '80px' }} />
+            </div>
+            <button onClick={handleCheckout} disabled={checkoutLoading}
+              style={{ width: '100%', padding: '0.875rem', background: '#10b981', color: 'white', border: 'none',
+                borderRadius: '8px', fontWeight: 600, cursor: checkoutLoading ? 'not-allowed' : 'pointer' }}>
+              {checkoutLoading ? 'Đang xử lý Transaction...' : 'Xác nhận Đặt Hàng'}
+            </button>
           </div>
         </div>
       )}
