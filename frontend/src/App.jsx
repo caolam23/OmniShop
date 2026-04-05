@@ -11,6 +11,7 @@ import ProductManagement from './pages/ProductManagement';
 import CategoryManagement from './pages/CategoryManagement';
 import SupplierManagement from './pages/SupplierManagement';
 import ProductDetail from './pages/ProductDetail';
+import CartPage from './pages/CartPage';
 import './App.css';
 
 // Protected Route Component - Check token and optional role
@@ -74,6 +75,16 @@ export default function App() {
         <Route path="/shop" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         
+        {/* Protected Route - Cart */}
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <CartPage />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
