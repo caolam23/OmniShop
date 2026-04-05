@@ -4,6 +4,7 @@ import productApi from '../api/productApi';
 import categoryApi from '../api/categoryApi';
 import supplierApi from '../api/supplierApi';
 import authApi from '../api/authApi';
+import AdminSidebar from '../components/AdminSidebar';
 import styles from './ProductManagement.module.css';
 
 export default function ProductManagement() {
@@ -26,7 +27,6 @@ export default function ProductManagement() {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
-  const [isProductMenuOpen, setIsProductMenuOpen] = useState(true);
 
   // States Modal
   const [showModal, setShowModal] = useState(false);
@@ -186,33 +186,7 @@ export default function ProductManagement() {
 
   return (
     <div className={styles.pageContainer}>
-      {/* Sidebar - Tương tự RoleManagement */}
-      <aside className={styles.sidebar}>
-        <div className={styles.brand}>OmniShop</div>
-        <ul className={styles.navMenu}>
-          <li><a href="/dashboard" className={styles.navItem}>Dashboard</a></li>
-          <li><a href="/users" className={styles.navItem}>Quản lý Users</a></li>
-          <li><a href="/roles" className={styles.navItem}>Phân quyền (Roles)</a></li>
-          <li>
-            <div 
-              className={`${styles.navItem} ${styles.navItemParent} ${isProductMenuOpen ? styles.navItemActive : ''}`}
-              onClick={() => setIsProductMenuOpen(!isProductMenuOpen)}
-            >
-              <div className={styles.navItemLeft}>Sản phẩm & Kho</div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isProductMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-            {isProductMenuOpen && (
-              <div className={styles.subMenu}>
-                <a href="/products" className={`${styles.subNavItem} ${window.location.pathname === '/products' ? styles.subNavItemActive : ''}`}>Danh sách Sản phẩm</a>
-                <a href="/categories" className={`${styles.subNavItem} ${window.location.pathname === '/categories' ? styles.subNavItemActive : ''}`}>Danh mục</a>
-                <a href="/suppliers" className={`${styles.subNavItem} ${window.location.pathname === '/suppliers' ? styles.subNavItemActive : ''}`}>Nhà cung cấp</a>
-              </div>
-            )}
-          </li>
-        </ul>
-      </aside>
+      <AdminSidebar />
 
       <main className={styles.mainContent}>
         <div className={styles.headerContainer}>
