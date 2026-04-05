@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import productApi from '../api/productApi';
+import cartApi from '../api/cartApi';
 import styles from './ProductDetail.module.css';
 
 export default function ProductDetail() {
@@ -18,7 +19,7 @@ export default function ProductDetail() {
     // Lấy thông tin user
     const userStr = localStorage.getItem('user');
     if (userStr) {
-      try { setUser(JSON.parse(userStr)); } catch (err) {}
+      try { setUser(JSON.parse(userStr)); } catch { /* ignore error */ }
     }
 
     // Fetch chi tiết sản phẩm
@@ -28,10 +29,17 @@ export default function ProductDetail() {
         const res = await productApi.getProductById(id);
         if (res.success) {
           setProduct(res.data);
+          
+          // Tải số lượng giỏ hàng hiện tại
+          if (userStr) {
+            const cartRes = await cartApi.getCart();
+            if (cartRes.success) setCartCount(cartRes.data.products.length);
+          }
         } else {
           setError(res.message || 'Không tìm thấy sản phẩm');
         }
       } catch (err) {
+        console.error('Lỗi khi tải chi tiết sản phẩm:', err);
         setError('Có lỗi xảy ra khi tải dữ liệu sản phẩm');
       } finally {
         setLoading(false);
@@ -40,9 +48,16 @@ export default function ProductDetail() {
     fetchProduct();
   }, [id]);
 
-  const handleAddToCart = () => {
-    setCartCount(prev => prev + quantity);
-    alert(`Đã thêm ${quantity} "${product.name}" vào giỏ hàng!`);
+  const handleAddToCart = async () => {
+    try {
+      const res = await cartApi.addToCart({ productId: product._id, quantity });
+      if (res.success) {
+        setCartCount(res.data.products.length);
+        alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Lỗi khi thêm vào giỏ hàng');
+    }
   };
 
   const handleQuantityChange = (e) => {
@@ -81,6 +96,7 @@ export default function ProductDetail() {
         </Link>
         <nav className={styles.navLinks}>
           <Link to="/shop" className={styles.link}>Trang chủ</Link>
+          <Link to="/cart" className={styles.link}>Giỏ hàng</Link>
           {user ? (
             <div className={styles.userInfo}>
               <span className={styles.userName}>
@@ -90,14 +106,14 @@ export default function ProductDetail() {
           ) : (
             <Link to="/login" className={styles.link}>Đăng nhập</Link>
           )}
-          <div className={styles.cartIconWrapper} onClick={() => alert('Mở giỏ hàng')}>
+          <Link to="/cart" className={styles.cartIconWrapper}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"></circle>
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
             {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
-          </div>
+          </Link>
         </nav>
       </header>
 
