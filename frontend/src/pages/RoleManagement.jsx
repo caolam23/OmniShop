@@ -49,6 +49,7 @@ export default function RoleManagement() {
   const [success, setSuccess] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
 
   // Modal states
   const [showModal, setShowModal] = useState(false);
@@ -317,13 +318,28 @@ export default function RoleManagement() {
             </a>
           </li>
           <li>
-            <a href="#" className={styles.navItem} title="Chưa có sẵn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            <div 
+              className={`${styles.navItem} ${styles.navItemParent} ${isProductMenuOpen ? styles.navItemActive : ''}`}
+              onClick={() => setIsProductMenuOpen(!isProductMenuOpen)}
+            >
+              <div className={styles.navItemLeft}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                  <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+                Sản phẩm & Kho
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isProductMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
-              Sản phẩm & Kho
-            </a>
+            </div>
+            {isProductMenuOpen && (
+              <div className={styles.subMenu}>
+                <a href="/products" className={`${styles.subNavItem} ${window.location.pathname === '/products' ? styles.subNavItemActive : ''}`}>Danh sách Sản phẩm</a>
+                <a href="/categories" className={`${styles.subNavItem} ${window.location.pathname === '/categories' ? styles.subNavItemActive : ''}`}>Danh mục</a>
+                <a href="/suppliers" className={`${styles.subNavItem} ${window.location.pathname === '/suppliers' ? styles.subNavItemActive : ''}`}>Nhà cung cấp</a>
+              </div>
+            )}
           </li>
         </ul>
       </aside>

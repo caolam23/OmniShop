@@ -6,6 +6,10 @@ import UserProfile from './pages/UserProfile';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import RoleManagement from './pages/RoleManagement';
+import HomePage from './pages/HomePage';
+import ProductManagement from './pages/ProductManagement';
+import CategoryManagement from './pages/CategoryManagement';
+import SupplierManagement from './pages/SupplierManagement';
 import './App.css';
 
 // Protected Route Component - Check token and optional role
@@ -65,6 +69,9 @@ export default function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Shop Route */}
+        <Route path="/shop" element={<HomePage />} />
+        
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -104,6 +111,36 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['Admin']}>
               <RoleManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Quản lý Sản phẩm (Admin Only) */}
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute allowedRoles={['Admin']}>
+              <ProductManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Quản lý Danh mục */}
+        <Route
+          path="/categories"
+          element={
+            <ProtectedRoute allowedRoles={['Admin']}>
+              <CategoryManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Quản lý Nhà cung cấp */}
+        <Route
+          path="/suppliers"
+          element={
+            <ProtectedRoute allowedRoles={['Admin']}>
+              <SupplierManagement />
             </ProtectedRoute>
           }
         />

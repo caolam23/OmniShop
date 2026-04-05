@@ -18,6 +18,7 @@ const roleRoutes = require('./routes/roleRoutes');
 const productsRoutes = require('./routes/products');
 const categoriesRoutes = require('./routes/categories');
 const cartsRoutes = require('./routes/carts');
+const suppliersRoutes = require('./routes/suppliers');
 const messagesRoutes = require('./routes/messages');
 const uploadRoutes = require('./routes/upload');
 
@@ -64,6 +65,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/roles', roleRoutes);
 app.use('/api/v1/products', productsRoutes);
 app.use('/api/v1/categories', categoriesRoutes);
+app.use('/api/v1/suppliers', suppliersRoutes);
 app.use('/api/v1/carts', cartsRoutes);
 app.use('/api/v1/messages', messagesRoutes);
 app.use('/api/v1/upload', uploadRoutes);

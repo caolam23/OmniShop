@@ -94,6 +94,47 @@
   color: var(--primary);
 }
 
+.navItemParent {
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.navItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.subMenu {
+  display: flex;
+  flex-direction: column;
+  padding-left: 2.75rem;
+  margin-bottom: 0.5rem;
+  margin-top: -0.25rem;
+  gap: 0.25rem;
+}
+
+.subNavItem {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.subNavItem:hover {
+  color: var(--text-main);
+  background-color: #f1f5f9;
+}
+
+.subNavItemActive {
+  color: var(--primary);
+  background-color: #eef2ff;
+  font-weight: 500;
+}
+
 /* Header Section */
 .headerContainer {
   display: flex;

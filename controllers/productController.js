@@ -1,144 +1,142 @@
-// Ví dụ Products Controller - Cách implement chuẩn RESTful API
-
-const Product = require('../models/Product'); // Giả sử có Product model
-const { successResponse, errorResponse, getPagination } = require('../utils/responseHandler');
+const Product = require('../models/Product');
 
 // @route   GET /api/v1/products
-// @desc    Lấy danh sách products có phân trang
+// @desc    Lấy danh sách products có phân trang, tìm kiếm, sắp xếp
 // @access  Public
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, search = '' } = req.query;
+    // 1. Nhận query params
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || '';
+    const sortBy = req.query.sortBy || 'createdAt';
+    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     
-    // Phân trang
-    const { skip, limit: pageLimit } = getPagination(page, limit);
+    // 2. Xây dựng Query tìm kiếm (chỉ lấy SP chưa bị xóa mềm)
+    const query = { isDeleted: { $ne: true } };
     
-    // Build query
-    const query = {};
     if (search) {
-      query.name = { $regex: search, $options: 'i' }; // Case-insensitive search
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
     }
     
-    // Lấy tổng số products
+    // 3. Tính toán phân trang và sắp xếp
+    const skip = (page - 1) * limit;
+    const sortObj = { [sortBy]: sortOrder };
+    
     const total = await Product.countDocuments(query);
-    
-    // Lấy products của trang hiện tại
     const products = await Product.find(query)
+      .populate('category', 'name')
+      .populate('supplier', 'name')
+      .sort(sortObj)
       .skip(skip)
-      .limit(pageLimit)
-      .sort({ createdAt: -1 });
+      .limit(limit);
     
-    // Response với pagination info
-    return successResponse(res, {
-      products,
+    res.status(200).json({
+      success: true,
+      data: products,
       pagination: {
         total,
-        page: parseInt(page),
-        limit: pageLimit,
-        pages: Math.ceil(total / pageLimit),
-      },
-    }, 'Products fetched successfully');
-    
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     next(error);
   }
 };
 
 // @route   GET /api/v1/products/:id
-// @desc    Lấy chi tiết 1 product
 // @access  Public
 exports.getProductById = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    
-    const product = await Product.findById(id);
-    
-    if (!product) {
-      return errorResponse(res, 'Product not found', 404);
+    const product = await Product.findById(req.params.id)
+      .populate('category', 'name')
+      .populate('supplier', 'name');
+      
+    if (!product || product.isDeleted) {
+      return res.status(404).json({ success: false, message: 'Sản phẩm không tồn tại' });
     }
-    
-    return successResponse(res, { product }, 'Product fetched successfully');
-    
+    res.status(200).json({ success: true, data: product });
   } catch (error) {
     next(error);
   }
 };
 
 // @route   POST /api/v1/products
-// @desc    Tạo product mới (chỉ admin)
+// @desc    Tạo product mới (Có xử lý file ảnh)
 // @access  Private/Admin
 exports.createProduct = async (req, res, next) => {
   try {
-    const { name, description, price, stock, category } = req.body;
+    const { name, description, price, stock, category, supplier } = req.body;
+    let imagePath = '';
     
-    // Validate input
-    if (!name || !price || !stock) {
-      return errorResponse(res, 'Name, price, and stock are required', 400);
+    // Nếu có file upload từ multer
+    if (req.file) {
+      imagePath = `/uploads/products/${req.file.filename}`;
     }
     
-    // Tạo product
     const product = new Product({
       name,
       description,
       price,
       stock,
       category,
+      supplier,
+      image: imagePath || req.body.image // Ưu tiên file upload, sau đó là link ngoài (nếu có)
     });
     
     await product.save();
-    
-    return successResponse(res, { product }, 'Product created successfully', 201);
-    
+    res.status(201).json({ success: true, data: product, message: 'Tạo sản phẩm thành công' });
   } catch (error) {
     next(error);
   }
 };
 
 // @route   PUT /api/v1/products/:id
-// @desc    Cập nhật product (chỉ admin)
+// @desc    Cập nhật product (Có xử lý file ảnh)
 // @access  Private/Admin
 exports.updateProduct = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { name, description, price, stock, category } = req.body;
+    const updateData = { ...req.body };
     
-    let product = await Product.findById(id);
-    
-    if (!product) {
-      return errorResponse(res, 'Product not found', 404);
+    // Nếu có upload ảnh mới thì cập nhật đường dẫn ảnh
+    if (req.file) {
+      updateData.image = `/uploads/products/${req.file.filename}`;
     }
     
-    // Update only provided fields
-    if (name) product.name = name;
-    if (description) product.description = description;
-    if (price) product.price = price;
-    if (stock !== undefined) product.stock = stock;
-    if (category) product.category = category;
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
     
-    await product.save();
-    
-    return successResponse(res, { product }, 'Product updated successfully');
-    
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Sản phẩm không tồn tại' });
+    }
+    res.status(200).json({ success: true, data: product, message: 'Cập nhật thành công' });
   } catch (error) {
     next(error);
   }
 };
 
 // @route   DELETE /api/v1/products/:id
-// @desc    Xóa product (chỉ admin)
+// @desc    Xóa mềm product
 // @access  Private/Admin
 exports.deleteProduct = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    
-    const product = await Product.findByIdAndDelete(id);
-    
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { isDeleted: true },
+      { new: true }
+    );
     if (!product) {
-      return errorResponse(res, 'Product not found', 404);
+      return res.status(404).json({ success: false, message: 'Sản phẩm không tồn tại' });
     }
-    
-    return successResponse(res, { product }, 'Product deleted successfully');
-    
+    res.status(200).json({ success: true, message: 'Đã xóa sản phẩm thành công' });
   } catch (error) {
     next(error);
   }

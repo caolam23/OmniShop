@@ -24,16 +24,25 @@ exports.register = async (req, res, next) => {
       });
     }
 
-    // Lấy role "User" mặc định
-    let userRole = await Role.findOne({ name: 'User' });
+    // Xác định role dựa trên email (Tự động cấp Admin cho admin@omnishop.com)
+    let roleName = email === 'admin@omnishop.com' ? 'Admin' : 'User';
+    let userRole = await Role.findOne({ name: roleName });
     
     // Nếu không tìm thấy role, tạo nó
     if (!userRole) {
-      userRole = new Role({
-        name: 'User',
-        description: 'Regular User - Can browse and purchase',
-        permissions: ['products:read', 'carts:manage', 'orders:create'],
-      });
+      if (roleName === 'Admin') {
+        userRole = new Role({
+          name: 'Admin',
+          description: 'Quản trị viên hệ thống',
+          permissions: ['*'],
+        });
+      } else {
+        userRole = new Role({
+          name: 'User',
+          description: 'Regular User - Can browse and purchase',
+          permissions: ['products:read', 'carts:manage', 'orders:create'],
+        });
+      }
       await userRole.save();
     }
 
@@ -42,7 +51,7 @@ exports.register = async (req, res, next) => {
       username, 
       email, 
       password,
-      role: userRole._id, // Gán role "User" mặc định
+      role: userRole._id,
     });
     await user.save();
 
