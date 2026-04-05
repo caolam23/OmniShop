@@ -1,0 +1,174 @@
+/* ReviewForm and ReviewList Styles */
+.formContainer,
+.listContainer {
+    margin-top: 24px;
+    padding: 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    font-family: 'Inter', sans-serif;
+}
+
+.loginPrompt {
+    padding: 16px;
+    background: #f8f9fa;
+    border-left: 4px solid #007bff;
+    color: #555;
+    margin-top: 24px;
+}
+
+h4 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: #333;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.starRating {
+    display: flex;
+    gap: 4px;
+}
+
+.starRating button {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 0;
+    line-height: 1;
+}
+
+.on {
+    color: #ffc107;
+}
+
+.off {
+    color: #e4e5e9;
+}
+
+.textarea {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.submitBtn {
+    align-self: flex-start;
+    padding: 10px 24px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background: #218838;
+}
+
+.submitBtn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 13px;
+    margin: -8px 0 0;
+}
+
+/* List Styles */
+.loading,
+.empty {
+    color: #666;
+    font-style: italic;
+    padding: 12px 0;
+}
+
+.reviewsList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.reviewItem {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.reviewItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.username {
+    font-weight: 600;
+    color: #333;
+}
+
+.date {
+    color: #888;
+    font-size: 13px;
+}
+
+.starsDisplay {
+    margin-bottom: 8px;
+}
+
+.starOn {
+    color: #ffc107;
+}
+
+.starOff {
+    color: #e4e5e9;
+}
+
+.comment {
+    color: #444;
+    margin: 0;
+    line-height: 1.5;
+    font-size: 14px;
+}

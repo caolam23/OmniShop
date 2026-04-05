@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Navbar, Container, Button } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
+import NotificationBell from './Notification/NotificationBell';
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function NavBar() {
     // Xóa token và user từ localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    
+
     // Redirect về login
     navigate('/login');
   };
@@ -34,6 +35,7 @@ export default function NavBar() {
 
         <Navbar.Collapse id="navbar-nav" className="justify-content-end">
           <div className="d-flex align-items-center gap-3">
+            <NotificationBell />
             <span className="text-white">
               {user?.username && `Welcome, ${user.username}`}
             </span>

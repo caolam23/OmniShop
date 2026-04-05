@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import NavBar from './Navbar';
 import Sidebar from './Sidebar';
+import ChatBox from './ChatBox/ChatBox';
+import AdminChatPanel from './ChatBox/AdminChatPanel';
 import './Layout.css';
 
 export default function Layout({ children }) {
@@ -9,7 +11,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      {/* Navbar */}
+      {/* Navbar (includes NotificationBell) */}
       <NavBar />
 
       {/* Main Content */}
@@ -24,6 +26,8 @@ export default function Layout({ children }) {
           </div>
         </div>
       </div>
+      <ChatBox />
+      <AdminChatPanel />
     </div>
   );
 }

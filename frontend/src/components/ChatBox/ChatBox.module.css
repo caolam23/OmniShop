@@ -1,0 +1,136 @@
+.chatContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  font-family: 'Inter', sans-serif;
+}
+
+.toggleBtn {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.toggleBtn:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
+
+.chatWindow {
+  width: 320px;
+  height: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  background: #007bff;
+  color: white;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.messageWrapper {
+  display: flex;
+}
+
+.sent {
+  justify-content: flex-end;
+}
+
+.received {
+  justify-content: flex-start;
+}
+
+.messageBubble {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.sent .messageBubble {
+  background: #007bff;
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.received .messageBubble {
+  background: #e9ecef;
+  color: #333;
+  border-bottom-left-radius: 2px;
+}
+
+.footer {
+  display: flex;
+  padding: 12px;
+  border-top: 1px solid #eee;
+  background: white;
+}
+
+.input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  font-size: 14px;
+}
+
+.input:focus {
+  border-color: #007bff;
+}
+
+.sendBtn {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-weight: 600;
+  margin-left: 12px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.sendBtn:hover {
+  color: #0056b3;
+}

@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authApi from '../api/authApi';
+import ChatBox from '../components/ChatBox/ChatBox';
+import AdminChatPanel from '../components/ChatBox/AdminChatPanel';
+import NotificationBell from '../components/Notification/NotificationBell';
 import styles from './UserProfile.module.css';
 
 // Utility function to truncate long names
@@ -56,9 +59,12 @@ export default function UserProfile() {
             </svg>
             OmniShop
           </div>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
-            Đăng xuất
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <NotificationBell />
+            <button className={styles.logoutBtn} onClick={handleLogout}>
+              Đăng xuất
+            </button>
+          </div>
         </div>
       </header>
 
@@ -95,6 +101,8 @@ export default function UserProfile() {
           </div>
         </div>
       </main>
+      <ChatBox />
+      <AdminChatPanel />
     </div>
   );
 }

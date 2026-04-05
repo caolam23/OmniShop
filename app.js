@@ -18,9 +18,10 @@ const roleRoutes = require('./routes/roleRoutes');
 const productsRoutes = require('./routes/products');
 const categoriesRoutes = require('./routes/categories');
 const cartsRoutes = require('./routes/carts');
-const messagesRoutes = require('./routes/messages');
+const messagesRoutes = require('./routes/messageRoutes');
 const uploadRoutes = require('./routes/upload');
-
+const reviewRoutes = require('./routes/reviewRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const app = express();
 
 // =========================
@@ -67,6 +68,10 @@ app.use('/api/v1/categories', categoriesRoutes);
 app.use('/api/v1/carts', cartsRoutes);
 app.use('/api/v1/messages', messagesRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
+const orderRoutes = require('./routes/orderRoutes');
+app.use('/api/v1/orders', orderRoutes);
 
 // API health check
 app.get('/api/v1/health', (req, res) => {

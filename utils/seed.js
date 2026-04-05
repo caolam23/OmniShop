@@ -49,36 +49,36 @@ const seedDatabase = async () => {
     await mongoose.connect(MONGODB_URI);
     console.log('✓ Connected to MongoDB');
 
-    // Check if roles already exist
-    const existingRoles = await Role.countDocuments();
-    if (existingRoles === 0) {
-      // Insert default roles
-      const roles = await Role.insertMany(defaultRoles);
-      console.log(`✓ Created ${roles.length} default roles`);
-
-      // Get Admin role
-      const adminRole = await Role.findOne({ name: 'Admin' });
-
-      // Check if admin user exists
-      const existingAdmin = await User.findOne({ email: defaultAdminUser.email });
-      if (!existingAdmin) {
-        // Create admin user
-        const adminUser = new User({
-          username: defaultAdminUser.username,
-          email: defaultAdminUser.email,
-          password: defaultAdminUser.password,
-          role: adminRole._id,
-        });
-
-        await adminUser.save();
-        console.log('✓ Created default admin user');
-        console.log(`  Email: ${defaultAdminUser.email}`);
-        console.log(`  Password: ${defaultAdminUser.password}`);
-      } else {
-        console.log('ℹ Admin user already exists');
+    // Check and insert missing roles
+    console.log('ℹ Verifying roles...');
+    for (const roleDef of defaultRoles) {
+      const existing = await Role.findOne({ name: roleDef.name });
+      if (!existing) {
+        await new Role(roleDef).save();
+        console.log(`✓ Created role: ${roleDef.name}`);
       }
+    }
+
+    // Get Admin role
+    const adminRole = await Role.findOne({ name: 'Admin' });
+
+    // Check if admin user exists
+    const existingAdmin = await User.findOne({ email: defaultAdminUser.email });
+    if (!existingAdmin) {
+      // Create admin user
+      const adminUser = new User({
+        username: defaultAdminUser.username,
+        email: defaultAdminUser.email,
+        password: defaultAdminUser.password,
+        role: adminRole._id,
+      });
+
+      await adminUser.save();
+      console.log('✓ Created default admin user');
+      console.log(`  Email: ${defaultAdminUser.email}`);
+      console.log(`  Password: ${defaultAdminUser.password}`);
     } else {
-      console.log('ℹ Roles already exist, skipping seed');
+      console.log('ℹ Admin user already exists');
     }
 
     console.log('✓ Database seeding completed');

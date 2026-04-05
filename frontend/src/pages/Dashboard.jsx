@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authApi from '../api/authApi';
+import axiosClient from '../api/axiosClient';
+import ReviewForm from '../components/Review/ReviewForm';
+import ReviewList from '../components/Review/ReviewList';
+import NotificationBell from '../components/Notification/NotificationBell';
+import ChatBox from '../components/ChatBox/ChatBox';
+import AdminChatPanel from '../components/ChatBox/AdminChatPanel';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
@@ -103,14 +109,17 @@ export default function Dashboard() {
             <h1 className={styles.pageTitle}>Dashboard</h1>
             <p className={styles.pageSubtitle}>Chào mừng bạn trở lại, hệ thống OmniShop Admin.</p>
           </div>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-            Đăng xuất
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <NotificationBell />
+            <button className={styles.logoutBtn} onClick={handleLogout}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Đăng xuất
+            </button>
+          </div>
         </div>
 
         {/* Error Alert */}
@@ -280,9 +289,40 @@ export default function Dashboard() {
                 </a>
               </div>
             </div>
+
+            {/* Component Phase 4 Testing Area */}
+            <div className={styles.card} style={{ marginTop: '24px' }}>
+              <h3 className={styles.sectionTitle}>[TEST] Khu vực giả lập Phase 4 (Dành cho Thành viên 5)</h3>
+              <p style={{ color: '#555', fontSize: '14px', marginBottom: '16px' }}>
+                Đây là khu vực test NotificationRealtime và Form Đánh giá Sản phẩm. Sau khi bấm nút bên dưới, hãy nhìn lên quả chuông màu xám trên Menu Top!
+              </p>
+
+              <button
+                onClick={async () => {
+                  try {
+                    await axiosClient.post('/orders/checkout');
+                    alert('Đã gửi request Thanh toán thành công! Hãy đợi socket báo chuông trong 1s nhé...');
+                  } catch (e) {
+                    alert('Lỗi: ' + e.message);
+                  }
+                }}
+                style={{ padding: '10px 20px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginBottom: '24px', fontWeight: 'bold' }}
+              >
+                🛒 Đặt Hàng Mới (Kích Hoạt Notification Socket)
+              </button>
+
+
+              <hr style={{ margin: '20px 0', borderColor: '#eee' }} />
+
+              <h3 className={styles.sectionTitle}>Giả lập Form Chi tiết Sản phẩm</h3>
+              <ReviewForm productId="662b6623e6b02e1234567890" />
+              <ReviewList productId="662b6623e6b02e1234567890" />
+            </div>
           </>
         )}
       </main>
+      <ChatBox />
+      <AdminChatPanel />
     </div>
   );
 }
