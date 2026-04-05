@@ -11,6 +11,8 @@ exports.getAllProducts = async (req, res, next) => {
     const search = req.query.search || '';
     const sortBy = req.query.sortBy || 'createdAt';
     const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
+    const category = req.query.category;
+    const supplier = req.query.supplier;
     
     // 2. Xây dựng Query tìm kiếm (chỉ lấy SP chưa bị xóa mềm)
     const query = { isDeleted: { $ne: true } };
@@ -20,6 +22,13 @@ exports.getAllProducts = async (req, res, next) => {
         { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } }
       ];
+    }
+
+    if (category) {
+      query.category = category;
+    }
+    if (supplier) {
+      query.supplier = supplier;
     }
     
     // 3. Tính toán phân trang và sắp xếp

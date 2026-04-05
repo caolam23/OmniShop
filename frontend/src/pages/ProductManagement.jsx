@@ -27,6 +27,8 @@ export default function ProductManagement() {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterSupplier, setFilterSupplier] = useState('');
 
   // States Modal
   const [showModal, setShowModal] = useState(false);
@@ -67,13 +69,22 @@ export default function ProductManagement() {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [currentPage, limit, search, sortBy, sortOrder]);
+  }, [currentPage, limit, search, sortBy, sortOrder, filterCategory, filterSupplier]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
       setError('');
-      const params = { page: currentPage, limit, search, sortBy, sortOrder };
+      const params = { 
+        page: currentPage, 
+        limit, 
+        search, 
+        sortBy, 
+        sortOrder 
+      };
+      if (filterCategory) params.category = filterCategory;
+      if (filterSupplier) params.supplier = filterSupplier;
+
       const response = await productApi.getAllProducts(params);
       
       if (response.success) {
@@ -206,7 +217,7 @@ export default function ProductManagement() {
             + Thêm Sản Phẩm
           </button>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
             <input
               type="text"
               placeholder="Tìm tên hoặc mô tả..."
@@ -219,6 +230,32 @@ export default function ProductManagement() {
               }}
             />
             
+            <select 
+              className={styles.formInput} 
+              style={{ height: '42px', width: '180px' }}
+              value={filterCategory}
+              onChange={(e) => {
+                setFilterCategory(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="">Tất cả danh mục</option>
+              {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+            </select>
+
+            <select 
+              className={styles.formInput} 
+              style={{ height: '42px', width: '180px' }}
+              value={filterSupplier}
+              onChange={(e) => {
+                setFilterSupplier(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="">Tất cả NCC</option>
+              {suppliers.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+            </select>
+
             <select 
               className={styles.formInput} 
               style={{ height: '42px' }}
