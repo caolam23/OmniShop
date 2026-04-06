@@ -11,6 +11,8 @@ import ProductManagement from './pages/ProductManagement';
 import CategoryManagement from './pages/CategoryManagement';
 import SupplierManagement from './pages/SupplierManagement';
 import ProductDetail from './pages/ProductDetail';
+import SupportPanel from './pages/SupportPanel';
+import ChatBox from './components/ChatBox/ChatBox';
 import './App.css';
 
 // Protected Route Component - Check token and optional role
@@ -73,7 +75,7 @@ export default function App() {
         {/* Public Shop Route */}
         <Route path="/shop" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-        
+
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -147,12 +149,23 @@ export default function App() {
           }
         />
 
+        {/* Quản lý Chat Khách hàng */}
+        <Route
+          path="/support"
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Staff']}>
+              <SupportPanel />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Default Route */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         {/* 404 Not Found */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
+      <ChatBox />
     </Router>
   );
 }

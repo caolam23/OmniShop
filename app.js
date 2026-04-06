@@ -19,7 +19,8 @@ const productsRoutes = require('./routes/products');
 const categoriesRoutes = require('./routes/categories');
 const cartsRoutes = require('./routes/carts');
 const suppliersRoutes = require('./routes/suppliers');
-const messagesRoutes = require('./routes/messages');
+const messagesRoutes = require('./routes/messageRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 const uploadRoutes = require('./routes/upload');
 
 const app = express();
@@ -68,6 +69,7 @@ app.use('/api/v1/categories', categoriesRoutes);
 app.use('/api/v1/suppliers', suppliersRoutes);
 app.use('/api/v1/carts', cartsRoutes);
 app.use('/api/v1/messages', messagesRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 
 // API health check

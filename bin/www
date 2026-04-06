@@ -21,6 +21,19 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+const { Server } = require("socket.io");
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ["GET", "POST"]
+  }
+});
+
+// ✅ Tách biệt: bin/www chỉ khởi tạo server & io.
+// Toàn bộ business logic chat nằm tại socketHandlers/chatHandler.js
+const registerChatHandlers = require('../socketHandlers/chatHandler');
+registerChatHandlers(io);
+
 /**
  * Listen on provided port, on all network interfaces.
  */

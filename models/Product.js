@@ -21,10 +21,12 @@ const productSchema = new mongoose.Schema({
     default: 0
   },
   image: {
-    type: String 
+    type: String
   },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
   supplier: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier' },
+  averageRating: { type: Number, default: 0 },
+  reviewCount: { type: Number, default: 0 },
   isDeleted: { type: Boolean, default: false, select: false }
 }, { timestamps: true });
 

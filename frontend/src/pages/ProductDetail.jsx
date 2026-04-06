@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import productApi from '../api/productApi';
+import ReviewSection from '../components/Review/ReviewSection';
 import styles from './ProductDetail.module.css';
 
 export default function ProductDetail() {
   const { id } = useParams(); // Lấy ID sản phẩm từ URL
   const navigate = useNavigate();
-  
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -18,7 +19,7 @@ export default function ProductDetail() {
     // Lấy thông tin user
     const userStr = localStorage.getItem('user');
     if (userStr) {
-      try { setUser(JSON.parse(userStr)); } catch (err) {}
+      try { setUser(JSON.parse(userStr)); } catch (err) { }
     }
 
     // Fetch chi tiết sản phẩm
@@ -69,7 +70,7 @@ export default function ProductDetail() {
     <div className={styles.pageContainer}>
       {/* Header dùng chung giống HomePage */}
       <header className={styles.navbar}>
-        <Link to="/shop" className={styles.logoWrapper} style={{textDecoration: 'none'}}>
+        <Link to="/shop" className={styles.logoWrapper} style={{ textDecoration: 'none' }}>
           <div className={styles.logo}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
@@ -120,7 +121,7 @@ export default function ProductDetail() {
               <div className={styles.categoryLabel}>{product.category?.name || 'Chung'}</div>
               <h1 className={styles.productName}>{product.name}</h1>
             </div>
-            
+
             <div className={styles.priceRow}>
               <div className={styles.productPrice}>
                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
@@ -165,6 +166,9 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+
+        {/* Review Section */}
+        <ReviewSection productId={id} />
       </main>
     </div>
   );
