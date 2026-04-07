@@ -5,8 +5,8 @@ let ExcelJS = require('exceljs');
 
 // Dùng authMiddleware để khớp JWT secret với auth/login
 const { verifyToken, checkRole } = require('../middlewares/authMiddleware');
-let orderModel = require('../schemas/orders');
-let orderDetailModel = require('../schemas/orderDetails');
+const orderModel = require('../models/Order');
+const orderDetailModel = require('../models/OrderDetail');
 let cartModel = require('../schemas/carts');
 let inventoryModel = require('../schemas/inventories');
 let productModel = require('../schemas/products');
