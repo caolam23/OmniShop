@@ -3,7 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import productApi from '../api/productApi';
 import categoryApi from '../api/categoryApi';
 import authApi from '../api/authApi';
+import cartApi from '../api/cartApi';
 import styles from './HomePage.module.css';
+
+// Hằng số cấu hình (Nên đưa vào file config riêng nếu có thể)
+const IMAGE_BASE_URL = 'http://localhost:3000';
+
+// Helper format tiền tệ VND
+const formatVND = (amount) => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+};
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -39,6 +48,14 @@ export default function HomePage() {
         if (prodRes.success) {
           setProducts(prodRes.data);
           setFilteredProducts(prodRes.data);
+          
+          // Nếu đã đăng nhập, tải số lượng giỏ hàng thực tế
+          if (userStr) {
+            const cartRes = await cartApi.getCart();
+            if (cartRes.success) {
+              setCartCount(cartRes.data.products.length);
+            }
+          }
         }
         if (catRes.success) {
           setCategories(catRes.data);
@@ -79,9 +96,16 @@ export default function HomePage() {
     setFilteredProducts(result);
   }, [searchTerm, selectedCategory, sortOption, products]);
 
-  const handleAddToCart = (product) => {
-    setCartCount(prev => prev + 1);
-    alert(`Đã thêm "${product.name}" vào giỏ hàng!\n(Tính năng chi tiết do An Phong phát triển)`);
+  const handleAddToCart = async (product) => {
+    try {
+      const res = await cartApi.addToCart({ productId: product._id, quantity: 1 });
+      if (res.success) {
+        setCartCount(res.data.products.length);
+        alert(`Đã thêm "${product.name}" vào giỏ hàng!`);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Vui lòng đăng nhập để mua hàng');
+    }
   };
 
   const handleLogout = () => {
@@ -94,16 +118,17 @@ export default function HomePage() {
     <div className={styles.homeContainer}>
       {/* Navbar Khách hàng */}
       <header className={styles.navbar}>
-        <div className={styles.logo}>
+        <Link to="/shop" className={styles.logo} style={{ textDecoration: 'none' }}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <path d="M16 10a4 4 0 0 1-8 0"></path>
           </svg>
           OmniShop
-        </div>
+        </Link>
         <nav className={styles.navLinks}>
           <Link to="/shop" className={styles.link}>Trang chủ</Link>
+          <Link to="/cart" className={styles.link}>Giỏ hàng</Link>
           
           {user ? (
             <div className={styles.userInfo}>
@@ -119,14 +144,14 @@ export default function HomePage() {
             <Link to="/login" className={styles.link}>Đăng nhập</Link>
           )}
 
-          <div className={styles.cartIconWrapper} onClick={() => alert('Mở giỏ hàng')}>
+          <Link to="/cart" className={styles.cartIconWrapper}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"></circle>
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
             {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
-          </div>
+          </Link>
         </nav>
       </header>
 
@@ -229,7 +254,7 @@ export default function HomePage() {
               <div key={product._id} className={styles.productCard}>
                 <Link to={`/product/${product._id}`} className={styles.imageContainer}>
                   {product.image ? (
-                    <img src={`http://localhost:3000${product.image}`} alt={product.name} loading="lazy" />
+                    <img src={`${IMAGE_BASE_URL}${product.image}`} alt={product.name} loading="lazy" />
                   ) : (
                     <div className={styles.noImage}>
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
@@ -246,9 +271,7 @@ export default function HomePage() {
                   <Link to={`/product/${product._id}`} style={{ textDecoration: 'none' }}>
                     <h3 className={styles.productName} title={product.name}>{product.name}</h3>
                   </Link>
-                  <p className={styles.productPrice}>
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
-                  </p>
+                  <p className={styles.productPrice}>{formatVND(product.price)}</p>
                   <button 
                     className={styles.addToCartBtn} 
                     onClick={() => handleAddToCart(product)}

@@ -6,6 +6,7 @@ import UserProfile from './pages/UserProfile';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import RoleManagement from './pages/RoleManagement';
+import CouponManagement from './pages/CouponManagement';
 import HomePage from './pages/HomePage';
 import ProductManagement from './pages/ProductManagement';
 import CategoryManagement from './pages/CategoryManagement';
@@ -13,6 +14,9 @@ import SupplierManagement from './pages/SupplierManagement';
 import ProductDetail from './pages/ProductDetail';
 import SupportPanel from './pages/SupportPanel';
 import ChatBox from './components/ChatBox/ChatBox';
+import CartPage from './pages/CartPage';
+import OrderManagement from './pages/OrderManagement';
+import MyOrders from './pages/MyOrders';
 import './App.css';
 
 // Protected Route Component - Check token and optional role
@@ -75,6 +79,16 @@ export default function App() {
         {/* Public Shop Route */}
         <Route path="/shop" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductDetail />} />
+        
+        {/* Protected Route - Cart */}
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <CartPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
@@ -119,6 +133,15 @@ export default function App() {
           }
         />
 
+        <Route
+          path="/coupons"
+          element={
+            <ProtectedRoute allowedRoles={['Admin']}>
+              <CouponManagement />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Quản lý Sản phẩm (Admin Only) */}
         <Route
           path="/products"
@@ -155,6 +178,26 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['Admin', 'Staff']}>
               <SupportPanel />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin/Staff: Quản lý Đơn hàng */}
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Staff']}>
+              <OrderManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Tất cả user đã đăng nhập: Lịch sử đơn hàng của tôi */}
+        <Route
+          path="/my-orders"
+          element={
+            <ProtectedRoute>
+              <MyOrders />
             </ProtectedRoute>
           }
         />

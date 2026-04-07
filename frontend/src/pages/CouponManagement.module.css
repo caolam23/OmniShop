@@ -1,0 +1,11 @@
+@import './ProductManagement.module.css';
+
+/* Tùy chỉnh thêm cho các Badge trạng thái nếu cần */
+.badgeSuccess { background-color: #dcfce7; color: #15803d; }
+.badgeWarning { background-color: #fee2e2; color: #991b1b; }
+
+.btnDelete {
+  background-color: #ef4444;
+  color: white;
+  margin-left: 8px;
+}
