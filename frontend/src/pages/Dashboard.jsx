@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authApi from '../api/authApi';
+import userApi from '../api/userApi';
+import productApi from '../api/productApi';
+import orderApi from '../api/orderApi';
 import AdminSidebar from '../components/AdminSidebar';
 import styles from './Dashboard.module.css';
 
@@ -9,6 +12,11 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalProducts: 0,
+    totalOrders: 0
+  });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -28,7 +36,48 @@ export default function Dashboard() {
       }
     };
 
+    const fetchDashboardData = async () => {
+      try {
+        // Gọi đồng thời các API để lấy số liệu
+        const [usersRes, productsRes, ordersRes] = await Promise.all([
+          userApi.getAllUsers().catch(() => ({ success: false, data: [] })),
+          productApi.getAllProducts({ limit: 10000 }).catch(() => ({ success: false, data: [] })),
+          orderApi.getAllOrders().catch(() => ({ success: false, data: [] }))
+        ]);
+
+        let totalUsers = 0;
+        let totalProducts = 0;
+        let totalOrders = 0;
+
+        if (usersRes.success) {
+          const usersList = Array.isArray(usersRes.data) ? usersRes.data : (usersRes.data?.users || []);
+          totalUsers = usersList.length;
+        }
+
+        if (productsRes.success) {
+          const productsList = Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.products || []);
+          // Đếm số lượng sản phẩm (mẫu/loại sản phẩm)
+          totalProducts = productsList.length;
+        }
+        if (ordersRes && ordersRes.success !== false) {
+          if (ordersRes.total !== undefined) {
+            totalOrders = ordersRes.total;
+          } else if (ordersRes.data && ordersRes.data.total !== undefined) {
+            totalOrders = ordersRes.data.total;
+          } else {
+            const ordersList = Array.isArray(ordersRes) ? ordersRes : (ordersRes.orders || ordersRes.data?.orders || (Array.isArray(ordersRes.data) ? ordersRes.data : []));
+            totalOrders = ordersList.length;
+          }
+        }
+
+        setStats({ totalUsers, totalProducts, totalOrders });
+      } catch (err) {
+        console.error('Error fetching dashboard stats:', err);
+      }
+    };
+
     fetchUser();
+    fetchDashboardData();
   }, []);
 
   const handleLogout = async () => {
@@ -90,8 +139,8 @@ export default function Dashboard() {
                     </svg>
                   </div>
                 </div>
-                <div className={styles.statValue}>1,234</div>
-                <div className={`${styles.statTrend} ${styles.trendUp}`}>↑ 12% so với tháng trước</div>
+                <div className={styles.statValue}>{stats.totalUsers}</div>
+                <div className={`${styles.statTrend} ${styles.trendUp}`}>Cập nhật theo thời gian thực</div>
               </div>
 
               <div className={styles.card}>
@@ -103,8 +152,8 @@ export default function Dashboard() {
                     </svg>
                   </div>
                 </div>
-                <div className={styles.statValue}>567</div>
-                <div className={styles.statTrend}>Đang kinh doanh</div>
+                <div className={styles.statValue}>{stats.totalProducts}</div>
+                <div className={styles.statTrend}>Tổng tồn kho hiện tại</div>
               </div>
 
               <div className={styles.card}>
@@ -119,22 +168,8 @@ export default function Dashboard() {
                     </svg>
                   </div>
                 </div>
-                <div className={styles.statValue}>892</div>
-                <div className={`${styles.statTrend} ${styles.trendUp}`}>↑ 8.5% so với tuần trước</div>
-              </div>
-
-              <div className={styles.card}>
-                <div className={styles.statHeader}>
-                  <span className={styles.statTitle}>Doanh Thu (Tháng)</span>
-                  <div className={`${styles.statIcon} ${styles.iconPurple}`}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="12" y1="1" x2="12" y2="23"></line>
-                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                    </svg>
-                  </div>
-                </div>
-                <div className={styles.statValue}>$45,234</div>
-                <div className={`${styles.statTrend} ${styles.trendUp}`}>↑ 23% so với tháng trước</div>
+                <div className={styles.statValue}>{stats.totalOrders}</div>
+                <div className={`${styles.statTrend} ${styles.trendUp}`}>Tổng đơn hệ thống</div>
               </div>
             </div>
 
