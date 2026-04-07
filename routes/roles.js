@@ -2,7 +2,7 @@
 var express = require("express");
 var router = express.Router();
 
-let roleModel = require("../schemas/roles");
+let roleModel = require("../models/Role");
 
 
 router.get("/", async function (req, res, next) {

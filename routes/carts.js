@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
-const { checkLogin, checkRole } = require("../utils/authHandler");
-let cartModel = require('../schemas/carts')
-let inventoryModel = require('../schemas/inventories')
+const { verifyToken: checkLogin, checkRole } = require("../middlewares/authMiddleware");
+let cartModel = require('../models/Cart')
+let inventoryModel = require('../models/Inventory')
 
 router.get('/', checkLogin, async function (req, res, next) {
     let user = req.user;

@@ -1,12 +1,23 @@
 var express = require("express");
 var router = express.Router();
-let { uploadExcel, uploadImage } = require('../utils/uploadHandler')
+const multer = require('multer');
+const path = require('path');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../uploads'))
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname)
+    }
+});
+const uploadImage = multer({ storage });
+const uploadExcel = multer({ storage });
+
 let { verifyToken, checkRole } = require('../middlewares/authMiddleware');
-let path = require('path')
 let excelJs = require('exceljs')
-let categoriesModel = require('../schemas/categories')
-let productsModel = require('../schemas/products')
-let inventoriesModel = require('../schemas/inventories')
+let categoriesModel = require('../models/Category')
+let productsModel = require('../models/Product')
+let inventoriesModel = require('../models/Inventory')
 let mongoose = require('mongoose')
 let slugify = require('slugify')
 

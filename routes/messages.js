@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 let { checkLogin } = require('../utils/authHandler')
 let { uploadImage } = require('../utils/uploadHandler')
-let userSchema = require('../schemas/users')
-let messageSchema = require('../schemas/messages')
+let userSchema = require('../models/User')
+let messageSchema = require('../models/Message')
 router.post('/', checkLogin, uploadImage.single('file'), async function (req, res, next) {
     let user01 = req.user._id;
     let user02 = req.body.to;
@@ -73,7 +73,7 @@ router.get('/', checkLogin, async function (req, res, next) {
     let result = [];
     messsageMap.forEach(function (value, key) {
         result.push({
-            user:key,
+            user: key,
             message: value
         })
     })
