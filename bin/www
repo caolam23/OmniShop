@@ -34,6 +34,8 @@ const io = new Server(server, {
 const registerChatHandlers = require('../socketHandlers/chatHandler');
 registerChatHandlers(io);
 
+app.set('io', io);
+
 /**
  * Listen on provided port, on all network interfaces.
  */

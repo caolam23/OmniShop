@@ -65,14 +65,10 @@ exports.updateCategory = async (req, res, next) => {
   }
 };
 
-// Xóa mềm (Soft Delete)
+// Xóa vĩnh viễn (Hard Delete)
 exports.deleteCategory = async (req, res, next) => {
   try {
-    const category = await Category.findByIdAndUpdate(
-      req.params.id,
-      { isDeleted: true },
-      { new: true }
-    );
+    const category = await Category.findByIdAndDelete(req.params.id);
     if (!category) {
       return res.status(404).json({ success: false, message: 'Danh mục không tồn tại' });
     }

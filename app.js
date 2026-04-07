@@ -22,6 +22,7 @@ const suppliersRoutes = require('./routes/suppliers');
 const messagesRoutes = require('./routes/messageRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const uploadRoutes = require('./routes/upload');
+const notificationRoutes = require('./routes/notificationRoutes');
 const ordersRoutes = require('./routes/orders');
 const couponsRoutes = require('./routes/coupons');
 
@@ -74,6 +75,7 @@ app.use('/api/v1/messages', messagesRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/orders', ordersRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/coupons', couponsRoutes);
 
 // API health check

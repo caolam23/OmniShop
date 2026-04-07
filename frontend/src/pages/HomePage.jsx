@@ -5,6 +5,8 @@ import categoryApi from '../api/categoryApi';
 import authApi from '../api/authApi';
 import cartApi from '../api/cartApi';
 import styles from './HomePage.module.css';
+import NotificationDropdown from '../components/Notification/NotificationDropdown';
+import { useSocket } from '../hooks/useSocket';
 
 // Hằng số cấu hình (Nên đưa vào file config riêng nếu có thể)
 const IMAGE_BASE_URL = 'http://localhost:3000';
@@ -27,6 +29,11 @@ export default function HomePage() {
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [addedProduct, setAddedProduct] = useState(null);
+  const [latestNotification, setLatestNotification] = useState(null);
+
+  useSocket(user?._id || user?.id, null, null, null, (notif) => {
+    setLatestNotification(notif);
+  });
 
   useEffect(() => {
     const userStr = localStorage.getItem('user');
@@ -130,6 +137,12 @@ export default function HomePage() {
           OmniShop
         </Link>
         <nav className={styles.navLinks}>
+          {user && (
+            <NotificationDropdown 
+              userId={user._id || user.id} 
+              latestNotification={latestNotification} 
+            />
+          )}
           <Link to="/shop" className={styles.link}>Trang chủ</Link>
           {user ? (
             <div className={styles.userInfo}>

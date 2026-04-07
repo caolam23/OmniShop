@@ -10,6 +10,7 @@ const orderDetailModel = require('../models/OrderDetail');
 let cartModel = require('../models/Cart');
 let inventoryModel = require('../models/Inventory');
 let productModel = require('../models/Product');
+const Coupon = require('../models/Coupon');
 
 // ============================================================
 // FALLBACK: Đặt hàng lưu tuần tự (Dành cho Local MongoDB Standalone)
@@ -17,7 +18,7 @@ let productModel = require('../models/Product');
 async function fallbackCheckout(req, res) {
     try {
         let user = req.user;
-        let { shippingAddress, note } = req.body;
+        let { shippingAddress, note, couponCode } = req.body;
         let cart = await cartModel.findOne({ user: user._id }).populate('products.product');
         
         if (!cart || cart.products.length === 0) return res.status(400).send({ message: 'Giỏ hàng trống' });
@@ -28,8 +29,23 @@ async function fallbackCheckout(req, res) {
             totalAmount += item.product.price * item.quantity;
         }
 
+        let discountAmount = 0;
+        if (couponCode) {
+            let appliedCoupon = await Coupon.findOne({ code: couponCode, isActive: true });
+            if (appliedCoupon && new Date() <= appliedCoupon.expiryDate && totalAmount >= appliedCoupon.minOrderValue) {
+                if (appliedCoupon.usageLimit === null || appliedCoupon.usedCount < appliedCoupon.usageLimit) {
+                    discountAmount = appliedCoupon.discountType === 'percentage' 
+                        ? (totalAmount * appliedCoupon.discountValue) / 100 
+                        : appliedCoupon.discountValue;
+                    appliedCoupon.usedCount += 1;
+                    await appliedCoupon.save();
+                }
+            }
+        }
+        let finalAmount = Math.max(0, totalAmount - discountAmount);
+
         let newOrder = new orderModel({
-            user: user._id, totalAmount, discountAmount: 0, finalAmount: totalAmount,
+            user: user._id, totalAmount, discountAmount, finalAmount,
             status: 'pending', shippingAddress: shippingAddress || '', note: note || ''
         });
         await newOrder.save();
@@ -55,6 +71,17 @@ async function fallbackCheckout(req, res) {
 
         cart.products = [];
         await cart.save();
+
+        const { createAndEmitNotification } = require('../controllers/notificationController');
+        const io = req.app.get('io');
+        await createAndEmitNotification(io, {
+            userId: user._id,
+            title: 'Đặt hàng thành công! 🎉',
+            message: `Mã đơn hàng ${newOrder._id.toString().substring(0, 8)} đã được tạo. Vui lòng chờ xác nhận.`,
+            type: 'NEW_ORDER',
+            relatedId: newOrder._id
+        });
+
         return res.send({ message: 'Đặt hàng thành công', order: newOrder });
     } catch (error) {
         console.error("Fallback Error:", error);
@@ -73,7 +100,7 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
     session.startTransaction();
     try {
         let user = req.user;
-        let { shippingAddress, note } = req.body;
+        let { shippingAddress, note, couponCode } = req.body;
 
         // Bước 1: Lấy giỏ hàng của user, populate thông tin sản phẩm
         let cart = await cartModel.findOne({ user: user._id }).populate('products.product');
@@ -94,12 +121,28 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
             totalAmount += item.product.price * item.quantity;
         }
 
+        // Tính toán mã giảm giá trong transaction
+        let discountAmount = 0;
+        if (couponCode) {
+            let appliedCoupon = await Coupon.findOne({ code: couponCode, isActive: true }).session(session);
+            if (appliedCoupon && new Date() <= appliedCoupon.expiryDate && totalAmount >= appliedCoupon.minOrderValue) {
+                if (appliedCoupon.usageLimit === null || appliedCoupon.usedCount < appliedCoupon.usageLimit) {
+                    discountAmount = appliedCoupon.discountType === 'percentage' 
+                        ? (totalAmount * appliedCoupon.discountValue) / 100 
+                        : appliedCoupon.discountValue;
+                    appliedCoupon.usedCount += 1;
+                    await appliedCoupon.save({ session });
+                }
+            }
+        }
+        let finalAmount = Math.max(0, totalAmount - discountAmount);
+
         // Bước 3: Tạo Order trong transaction
         let newOrder = new orderModel({
             user: user._id,
             totalAmount: totalAmount,
-            discountAmount: 0,
-            finalAmount: totalAmount,
+            discountAmount: discountAmount,
+            finalAmount: finalAmount,
             status: 'pending',
             shippingAddress: shippingAddress || '',
             note: note || ''
@@ -119,7 +162,7 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
                 await session.abortTransaction();
                 await session.endSession();
                 return res.status(400).send({
-                    message: `Sản phẩm "${item.product.name}" không đủ số lượng trong kho`
+                    message: `Sản phẩm "${item.product.name}" không đủ số lượng trong kho (Còn ${inventory?.stock || 0} sản phẩm)`
                 });
             }
 
@@ -145,7 +188,17 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
 
         // Tất cả OK → Commit transaction
         await session.commitTransaction();
-        await session.endSession();
+        session.endSession();
+
+        const { createAndEmitNotification } = require('../controllers/notificationController');
+        const io = req.app.get('io');
+        await createAndEmitNotification(io, {
+            userId: user._id,
+            title: 'Đặt hàng thành công! 🎉',
+            message: `Mã đơn hàng ${newOrder._id.toString().substring(0, 8)} đã được tạo. Vui lòng chờ xác nhận.`,
+            type: 'NEW_ORDER',
+            relatedId: newOrder._id
+        });
 
         res.send({
             message: 'Đặt hàng thành công',
@@ -313,15 +366,43 @@ router.patch('/:id/status', verifyToken, checkRole(['Admin', 'Staff']), async fu
             return res.status(400).send({ message: 'Trạng thái không hợp lệ' });
         }
 
-        let order = await orderModel.findByIdAndUpdate(
-            id,
-            { status },
-            { new: true }
-        );
+        let order = await orderModel.findById(id);
 
         if (!order) {
             return res.status(404).send({ message: 'Không tìm thấy đơn hàng' });
         }
+
+        // Nếu chuyển sang trạng thái huỷ và đơn hàng chưa bị huỷ trước đó
+        if (status === 'cancelled' && order.status !== 'cancelled') {
+            let details = await orderDetailModel.find({ order: id });
+            for (let detail of details) {
+                let inventory = await inventoryModel.findOne({ product: detail.product });
+                if (inventory) {
+                    // Hoàn lại số lượng vào kho và giảm số lượng đã bán
+                    inventory.stock += detail.quantity;
+                    inventory.soldCount = Math.max(0, inventory.soldCount - detail.quantity);
+                    await inventory.save();
+                }
+            }
+        }
+
+        order.status = status;
+        await order.save();
+
+        const { createAndEmitNotification } = require('../controllers/notificationController');
+        const io = req.app.get('io');
+        let statusText = status === 'confirmed' ? 'đã được xác nhận'
+            : status === 'shipping' ? 'đang trong quá trình giao hàng'
+                : status === 'delivered' ? 'đã được giao thành công'
+                    : status === 'cancelled' ? 'đã bị hủy' : 'đang chờ';
+
+        await createAndEmitNotification(io, {
+            userId: order.user,
+            title: 'Thông báo đơn hàng',
+            message: `Đơn hàng ${order._id.toString().substring(0, 8)} của bạn ${statusText}.`,
+            type: 'ORDER_STATUS',
+            relatedId: order._id
+        });
 
         res.send({ message: 'Cập nhật trạng thái thành công', order });
     } catch (error) {

@@ -221,7 +221,7 @@ export default function CartPage() {
               <span className={styles.totalAmount}>{formatVND(total)}</span>
             </div>
 
-            <button className={styles.checkoutBtn} onClick={() => navigate('/checkout')}>
+            <button className={styles.checkoutBtn} onClick={() => navigate('/checkout', { state: { appliedCoupon, discountAmount, total } })}>
               Tiến hành đặt hàng
             </button>
           </aside>

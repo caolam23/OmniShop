@@ -36,6 +36,8 @@ export default function ProductManagement() {
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -174,18 +176,25 @@ export default function ProductManagement() {
   };
 
   // Xóa mềm sản phẩm
-  const handleDelete = async (id) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      try {
-        const response = await productApi.deleteProduct(id);
-        if (response.success) {
-          setSuccess('Đã xóa sản phẩm!');
-          fetchProducts(); 
-          setTimeout(() => setSuccess(''), 3000);
-        }
-      } catch (err) {
-        setError(err?.message || 'Lỗi khi xóa');
+  const handleDelete = (id) => {
+    setProductToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
+    try {
+      const response = await productApi.deleteProduct(productToDelete);
+      if (response.success) {
+        setSuccess('Đã xóa sản phẩm!');
+        fetchProducts(); 
+        setTimeout(() => setSuccess(''), 3000);
       }
+    } catch (err) {
+      setError(err?.message || 'Lỗi khi xóa');
+    } finally {
+      setShowDeleteModal(false);
+      setProductToDelete(null);
     }
   };
 
@@ -350,6 +359,36 @@ export default function ProductManagement() {
           onSubmit={handleSubmit}
           onClose={() => setShowModal(false)}
         />
+
+        {/* Modal Xác nhận xóa */}
+        {showDeleteModal && (
+          <div onClick={() => setShowDeleteModal(false)}
+            style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
+            <div onClick={e => e.stopPropagation()}
+              style={{ background:'white', borderRadius:'8px', width:'400px', maxWidth:'90vw', padding:'2rem', textAlign:'center', boxShadow:'0 20px 60px rgba(0,0,0,0.15)', animation: 'modalFadeIn 0.2s ease-out' }}>
+              <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </div>
+              <h2 style={{ fontSize:'1.25rem', fontWeight:600, color:'#1f2937', marginBottom:'0.5rem', marginTop: 0 }}>Xác nhận xóa</h2>
+              <p style={{ color:'#6b7280', marginBottom:'2rem' }}>Bạn có chắc chắn muốn xóa sản phẩm này không?</p>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <button onClick={() => setShowDeleteModal(false)}
+                  style={{ flex: 1, background:'#f3f4f6', color:'#374151', border:'none', padding:'0.75rem', borderRadius:'6px', fontWeight:500, cursor:'pointer', transition: 'background 0.2s' }}>
+                  Hủy
+                </button>
+                <button onClick={confirmDelete}
+                  style={{ flex: 1, background:'#ef4444', color:'white', border:'none', padding:'0.75rem', borderRadius:'6px', fontWeight:500, cursor:'pointer', transition: 'background 0.2s' }}>
+                  Xóa
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import cartApi from '../api/cartApi';
 import orderApi from '../api/orderApi';
 import styles from './CheckoutPage.module.css';
@@ -10,6 +10,8 @@ const formatVND = (amount) => {
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { appliedCoupon, discountAmount, total } = location.state || {};
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [address, setAddress] = useState('');
@@ -54,7 +56,11 @@ export default function CheckoutPage() {
     setError('');
 
     try {
-      const res = await orderApi.checkout({ shippingAddress: address, note });
+      const res = await orderApi.checkout({ 
+        shippingAddress: address, 
+        note,
+        couponCode: appliedCoupon?.code 
+      });
       if (res.order) {
         // Hiển thị modal thay vì alert
         setShowSuccessModal(true);
@@ -104,8 +110,18 @@ export default function CheckoutPage() {
             </div>
             <hr />
             <div className={styles.totalRow}>
+              <span>Tạm tính:</span>
+              <span>{formatVND(calculateTotal())}</span>
+            </div>
+            {appliedCoupon && (
+              <div className={styles.totalRow} style={{ color: '#16a34a', marginTop: '0.5rem' }}>
+                <span>Giảm giá ({appliedCoupon.code}):</span>
+                <span>-{formatVND(discountAmount)}</span>
+              </div>
+            )}
+            <div className={styles.totalRow} style={{ marginTop: '0.5rem' }}>
               <span>Tổng cộng:</span>
-              <span className={styles.totalAmount}>{formatVND(calculateTotal())}</span>
+              <span className={styles.totalAmount}>{formatVND(total !== undefined ? total : calculateTotal())}</span>
             </div>
             <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
               {isSubmitting ? 'Đang xử lý...' : 'Xác nhận Đặt hàng'}

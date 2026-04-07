@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Navbar, Container, Nav } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
+import { useSocket } from '../hooks/useSocket';
+import NotificationDropdown from './Notification/NotificationDropdown';
 import styles from './Navbar.module.css';
 
 export default function NavBar() {
@@ -14,6 +16,11 @@ export default function NavBar() {
       setUser(JSON.parse(storedUser));
     }
   }, []);
+
+const [latestNotification, setLatestNotification] = useState(null);
+  // Join room mang tên user._id (hoặc user.id)
+  const currentUserId = user?._id || user?.id;
+  useSocket(currentUserId, null, null, null, setLatestNotification);
 
   const handleLogout = () => {
     // Xóa token và user từ localStorage
@@ -43,6 +50,12 @@ export default function NavBar() {
             <Nav.Link onClick={() => navigate('/shop')} className={styles.navLink}>Trang chủ</Nav.Link>
           </Nav>
           <div className="d-flex align-items-center gap-3">
+            {user && (
+              <NotificationDropdown
+                userId={currentUserId}
+                latestNotification={latestNotification}
+              />
+            )}
             <span className={styles.userInfo}>
               {user?.username && `Xin chào, ${user.username}`}
             </span>
