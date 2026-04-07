@@ -7,9 +7,9 @@ const ExcelJS = require('exceljs');
 const { verifyToken, checkRole } = require('../middlewares/authMiddleware');
 const orderModel = require('../models/Order');
 const orderDetailModel = require('../models/OrderDetail');
-let cartModel = require('../schemas/carts');
-let inventoryModel = require('../schemas/inventories');
-let productModel = require('../schemas/products');
+let cartModel = require('../models/Cart');
+let inventoryModel = require('../models/Inventory');
+let productModel = require('../models/Product');
 
 // ============================================================
 // POST /checkout - Đặt hàng (TRANSACTION)
