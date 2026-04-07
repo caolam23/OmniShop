@@ -15,6 +15,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [cartCount, setCartCount] = useState(0); // Mock giỏ hàng
   const [user, setUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     // Lấy thông tin user
@@ -54,7 +55,7 @@ export default function ProductDetail() {
       const res = await cartApi.addToCart({ productId: product._id, quantity });
       if (res.success) {
         setCartCount(res.data.products.length);
-        alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
+        setShowModal(true);
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Lỗi khi thêm vào giỏ hàng');
@@ -186,6 +187,36 @@ export default function ProductDetail() {
         {/* Review Section */}
         <ReviewSection productId={id} />
       </main>
+
+      {/* Modal Thêm vào giỏ hàng thành công */}
+      {showModal && (
+        <div onClick={() => setShowModal(false)}
+          style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)',
+            display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
+          <div onClick={e => e.stopPropagation()}
+            style={{ background:'white', borderRadius:'16px', width:'400px', maxWidth:'90vw',
+              padding:'2.5rem 2rem', textAlign:'center', boxShadow:'0 20px 60px rgba(0,0,0,0.15)', animation: 'modalFadeIn 0.3s ease-out' }}>
+            <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <h2 style={{ fontSize:'1.5rem', fontWeight:700, color:'#1f2937', marginBottom:'0.5rem', marginTop: 0 }}>Thành công!</h2>
+            <p style={{ color:'#6b7280', marginBottom:'2rem' }}>Đã thêm <strong>{quantity}</strong> sản phẩm vào giỏ hàng.</p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button onClick={() => setShowModal(false)}
+                style={{ flex: 1, background:'#f3f4f6', color:'#4b5563', border:'none', padding:'0.75rem', borderRadius:'8px', fontWeight:600, cursor:'pointer', transition: 'background 0.2s' }}>
+                Tiếp tục mua
+              </button>
+              <button onClick={() => navigate('/cart')}
+                style={{ flex: 1, background:'#16a34a', color:'white', border:'none', padding:'0.75rem', borderRadius:'8px', fontWeight:600, cursor:'pointer', transition: 'background 0.2s' }}>
+                Đến giỏ hàng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -102,25 +102,31 @@ export default function CouponManagement() {
               </tr>
             </thead>
             <tbody className={styles.tableBody}>
-              {coupons.map(c => (
-                <tr key={c._id}>
-                  <td className={styles.tableCell}><strong>{c.code}</strong></td>
-                  <td className={styles.tableCell}>
-                    {c.discountType === 'percentage' ? `${c.discountValue}%` : `${new Intl.NumberFormat('vi-VN').format(c.discountValue)}đ`}
-                  </td>
-                  <td className={styles.tableCell}>{new Intl.NumberFormat('vi-VN').format(c.minOrderValue)}đ</td>
-                  <td className={styles.tableCell}>{new Date(c.expiryDate).toLocaleDateString('vi-VN')}</td>
-                  <td className={styles.tableCell}>
-                    <span className={`${styles.badge} ${c.isActive ? styles.badgeSuccess : styles.badgeWarning}`}>
-                      {c.isActive ? 'Đang chạy' : 'Tạm dừng'}
-                    </span>
-                  </td>
-                  <td className={styles.tableCell}>
-                    <button className={styles.btnSmall} onClick={() => openEdit(c)}>Sửa</button>
-                    <button className={`${styles.btnSmall} ${styles.btnDelete}`} onClick={() => handleDelete(c._id)}>Xóa</button>
-                  </td>
-                </tr>
-              ))}
+              {coupons.map(c => {
+                const isExpired = new Date(c.expiryDate) < new Date();
+                const statusText = !c.isActive ? 'Tạm dừng' : (isExpired ? 'Hết hạn' : 'Đang chạy');
+                const badgeClass = c.isActive && !isExpired ? styles.badgeSuccess : styles.badgeWarning;
+                
+                return (
+                  <tr key={c._id}>
+                    <td className={styles.tableCell}><strong>{c.code}</strong></td>
+                    <td className={styles.tableCell}>
+                      {c.discountType === 'percentage' ? `${c.discountValue}%` : `${new Intl.NumberFormat('vi-VN').format(c.discountValue)}đ`}
+                    </td>
+                    <td className={styles.tableCell}>{new Intl.NumberFormat('vi-VN').format(c.minOrderValue)}đ</td>
+                    <td className={styles.tableCell}>{new Date(c.expiryDate).toLocaleDateString('vi-VN')}</td>
+                    <td className={styles.tableCell}>
+                      <span className={`${styles.badge} ${badgeClass}`}>
+                        {statusText}
+                      </span>
+                    </td>
+                    <td className={styles.tableCell}>
+                      <button className={styles.btnSmall} onClick={() => openEdit(c)}>Sửa</button>
+                      <button className={`${styles.btnSmall} ${styles.btnDelete}`} onClick={() => handleDelete(c._id)}>Xóa</button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

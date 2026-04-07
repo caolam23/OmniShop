@@ -12,6 +12,57 @@ let inventoryModel = require('../models/Inventory');
 let productModel = require('../models/Product');
 
 // ============================================================
+// FALLBACK: Đặt hàng lưu tuần tự (Dành cho Local MongoDB Standalone)
+// ============================================================
+async function fallbackCheckout(req, res) {
+    try {
+        let user = req.user;
+        let { shippingAddress, note } = req.body;
+        let cart = await cartModel.findOne({ user: user._id }).populate('products.product');
+        
+        if (!cart || cart.products.length === 0) return res.status(400).send({ message: 'Giỏ hàng trống' });
+
+        let totalAmount = 0;
+        for (let item of cart.products) {
+            if (!item.product) return res.status(400).send({ message: 'Sản phẩm không hợp lệ' });
+            totalAmount += item.product.price * item.quantity;
+        }
+
+        let newOrder = new orderModel({
+            user: user._id, totalAmount, discountAmount: 0, finalAmount: totalAmount,
+            status: 'pending', shippingAddress: shippingAddress || '', note: note || ''
+        });
+        await newOrder.save();
+
+        for (let item of cart.products) {
+            let inventory = await inventoryModel.findOne({ product: item.product._id });
+            // Tự động đồng bộ nếu sản phẩm cũ chưa có record Inventory
+            if (!inventory) {
+                inventory = await inventoryModel.create({ product: item.product._id, stock: item.product.stock || 0 });
+            }
+            if (!inventory || (inventory.stock - inventory.reserved) < item.quantity) {
+                return res.status(400).send({ message: `Sản phẩm "${item.product.name}" không đủ số lượng` });
+            }
+            let detail = new orderDetailModel({
+                order: newOrder._id, product: item.product._id, quantity: item.quantity,
+                unitPrice: item.product.price, subtotal: item.product.price * item.quantity
+            });
+            await detail.save();
+            inventory.stock -= item.quantity;
+            inventory.soldCount += item.quantity;
+            await inventory.save();
+        }
+
+        cart.products = [];
+        await cart.save();
+        return res.send({ message: 'Đặt hàng thành công', order: newOrder });
+    } catch (error) {
+        console.error("Fallback Error:", error);
+        return res.status(500).send({ message: error.message });
+    }
+}
+
+// ============================================================
 // POST /checkout - Đặt hàng (TRANSACTION)
 // Đây là API quan trọng nhất:
 // Tạo Order → Tạo OrderDetails → Trừ tồn kho → Xóa giỏ hàng
@@ -35,6 +86,11 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
         // Bước 2: Tính tổng tiền từ giỏ hàng
         let totalAmount = 0;
         for (let item of cart.products) {
+            if (!item.product) {
+                await session.abortTransaction();
+                await session.endSession();
+                return res.status(400).send({ message: 'Một sản phẩm trong giỏ hàng không hợp lệ hoặc đã bị xóa.' });
+            }
             totalAmount += item.product.price * item.quantity;
         }
 
@@ -54,11 +110,16 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
         for (let item of cart.products) {
             // Kiểm tra tồn kho
             let inventory = await inventoryModel.findOne({ product: item.product._id }).session(session);
-            if (!inventory || inventory.stock < item.quantity) {
+            // Tự động đồng bộ nếu sản phẩm cũ chưa có record Inventory
+            if (!inventory) {
+                inventory = new inventoryModel({ product: item.product._id, stock: item.product.stock || 0 });
+                await inventory.save({ session });
+            }
+            if (!inventory || (inventory.stock - inventory.reserved) < item.quantity) {
                 await session.abortTransaction();
                 await session.endSession();
                 return res.status(400).send({
-                    message: `Sản phẩm "${item.product.title}" không đủ số lượng trong kho`
+                    message: `Sản phẩm "${item.product.name}" không đủ số lượng trong kho`
                 });
             }
 
@@ -92,9 +153,17 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
         });
 
     } catch (error) {
-        // Bất kỳ lỗi nào → Rollback toàn bộ
-        await session.abortTransaction();
+        console.error("Lỗi Checkout Transaction:", error.message);
+        // Try-catch riêng cho việc abort để tránh lỗi đè lỗi
+        try { await session.abortTransaction(); } catch (abortErr) {}
         await session.endSession();
+        
+        // Tự động Fallback sang chế độ không Transaction nếu chạy local
+        if (error.message.includes('Transaction') || error.message.includes('replica set')) {
+            console.warn('⚠️ CẢNH BÁO: Đang chạy trên MongoDB Standalone. Tự động Fallback sang lưu không Transaction...');
+            return await fallbackCheckout(req, res);
+        }
+
         res.status(500).send({ message: error.message });
     }
 });
@@ -198,17 +267,35 @@ router.get('/', verifyToken, checkRole(['Admin', 'Staff']), async function (req,
 router.get('/:id', verifyToken, async function (req, res, next) {
     try {
         let id = req.params.id;
-        let order = await orderModel.findById(id).populate('user', 'username email');
+        
+        // Kiểm tra an toàn mã ID để tránh lỗi CastError
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({ message: 'Mã đơn hàng không hợp lệ' });
+        }
+
+        // Dùng strictPopulate: false để tránh crash nếu Schema thiếu khai báo ref
+        let order = await orderModel.findById(id).populate({
+            path: 'user',
+            select: 'username email',
+            strictPopulate: false
+        });
+
         if (!order) {
             return res.status(404).send({ message: 'Không tìm thấy đơn hàng' });
         }
 
         let details = await orderDetailModel
             .find({ order: id })
-            .populate('product', 'title price images');
+            .populate({
+                path: 'product',
+                select: 'name title price image images',
+                model: 'Product',
+                strictPopulate: false
+            });
 
         res.send({ order, details });
     } catch (error) {
+        console.error('Lỗi khi tải chi tiết đơn hàng:', error);
         res.status(500).send({ message: error.message });
     }
 });

@@ -1,4 +1,6 @@
 const Product = require('../models/Product');
+const Inventory = require('../models/Inventory');
+const mongoose = require('mongoose');
 
 // @route   GET /api/v1/products
 // @desc    Lấy danh sách products có phân trang, tìm kiếm, sắp xếp
@@ -31,10 +33,10 @@ exports.getAllProducts = async (req, res, next) => {
     }
 
     if (category) {
-      query.category = category;
+      query.category = new mongoose.Types.ObjectId(category);
     }
     if (supplier) {
-      query.supplier = supplier;
+      query.supplier = new mongoose.Types.ObjectId(supplier);
     }
     
     // 3. Tính toán phân trang và sắp xếp
@@ -42,13 +44,49 @@ exports.getAllProducts = async (req, res, next) => {
     const sortObj = { [sortBy]: sortOrder };
     
     const total = await Product.countDocuments(query);
-    const products = await Product.find(query)
-      .select('+isDeleted') // Ép Mongoose trả về trường isDeleted vốn bị ẩn (select: false)
-      .populate('category', 'name')
-      .populate('supplier', 'name')
-      .sort(sortObj)
-      .skip(skip)
-      .limit(limit);
+    
+    // Dùng aggregate với $lookup để lấy dữ liệu từ các collections liên quan
+    const products = await Product.aggregate([
+      { $match: query },
+      { $sort: sortObj },
+      { $skip: skip },
+      { $limit: limit },
+      { 
+        $lookup: { 
+          from: 'categories', 
+          localField: 'category', 
+          foreignField: '_id', 
+          as: 'category' 
+        } 
+      },
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+      { 
+        $lookup: { 
+          from: 'suppliers', 
+          localField: 'supplier', 
+          foreignField: '_id', 
+          as: 'supplier' 
+        } 
+      },
+      { $unwind: { path: '$supplier', preserveNullAndEmptyArrays: true } },
+      { 
+        $lookup: { 
+          from: 'inventories', 
+          localField: '_id', 
+          foreignField: 'product', 
+          as: 'inventoryData' 
+        } 
+      },
+      { $unwind: { path: '$inventoryData', preserveNullAndEmptyArrays: true } },
+      { 
+        $addFields: {
+          stock: { $ifNull: ['$inventoryData.stock', '$stock'] },
+          reserved: { $ifNull: ['$inventoryData.reserved', 0] },
+          soldCount: { $ifNull: ['$inventoryData.soldCount', 0] }
+        }
+      },
+      { $project: { inventoryData: 0 } } // Dọn dẹp object tạm
+    ]);
     
     res.status(200).json({
       success: true,
@@ -125,6 +163,13 @@ exports.createProduct = async (req, res, next) => {
     });
     
     await product.save();
+    
+    // Tự động tạo record Inventory khi tạo Product
+    await Inventory.create({
+      product: product._id,
+      stock: stock || 0
+    });
+    
     res.status(201).json({ success: true, data: product, message: 'Tạo sản phẩm thành công' });
   } catch (error) {
     next(error);
@@ -148,6 +193,15 @@ exports.updateProduct = async (req, res, next) => {
       updateData,
       { new: true, runValidators: true }
     );
+    
+    // Đồng bộ số lượng vào Inventory nếu Admin cập nhật stock
+    if (updateData.stock !== undefined) {
+      await Inventory.findOneAndUpdate(
+        { product: req.params.id },
+        { stock: updateData.stock },
+        { upsert: true }
+      );
+    }
     
     if (!product) {
       return res.status(404).json({ success: false, message: 'Sản phẩm không tồn tại' });

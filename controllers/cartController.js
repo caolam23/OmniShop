@@ -1,5 +1,6 @@
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
+const Inventory = require('../models/Inventory');
 
 // @desc    Lấy giỏ hàng của người dùng hiện tại
 // @route   GET /api/v1/carts
@@ -30,7 +31,15 @@ exports.addToCart = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Sản phẩm không tồn tại' });
     }
 
-    if (product.stock < quantity) {
+    // Kiểm tra kho thực tế qua Inventory
+    let inventory = await Inventory.findOne({ product: productId });
+    // Tự động đồng bộ nếu sản phẩm cũ chưa có record Inventory
+    if (!inventory) {
+      inventory = await Inventory.create({ product: productId, stock: product.stock || 0 });
+    }
+    const availableStock = inventory.stock - (inventory.reserved || 0);
+
+    if (availableStock < quantity) {
       return res.status(400).json({ success: false, message: 'Số lượng yêu cầu vượt quá tồn kho' });
     }
 
@@ -46,8 +55,8 @@ exports.addToCart = async (req, res, next) => {
     if (itemIndex > -1) {
       // Nếu đã có, kiểm tra tổng số lượng mới có vượt tồn kho không
       const newQuantity = cart.products[itemIndex].quantity + quantity;
-      if (product.stock < newQuantity) {
-        return res.status(400).json({ success: false, message: `Chỉ còn ${product.stock} sản phẩm trong kho` });
+      if (availableStock < newQuantity) {
+        return res.status(400).json({ success: false, message: `Chỉ còn ${availableStock} sản phẩm trong kho` });
       }
       cart.products[itemIndex].quantity = newQuantity;
     } else {
@@ -74,7 +83,14 @@ exports.updateQuantity = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Sản phẩm không tồn tại' });
     }
 
-    if (product.stock < quantity) {
+    let inventory = await Inventory.findOne({ product: productId });
+    // Tự động đồng bộ nếu sản phẩm cũ chưa có record Inventory
+    if (!inventory) {
+      inventory = await Inventory.create({ product: productId, stock: product.stock || 0 });
+    }
+    const availableStock = inventory.stock - (inventory.reserved || 0);
+
+    if (availableStock < quantity) {
       return res.status(400).json({ success: false, message: 'Sản phẩm không đủ số lượng trong kho' });
     }
 

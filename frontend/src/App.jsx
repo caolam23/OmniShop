@@ -15,8 +15,8 @@ import ProductDetail from './pages/ProductDetail';
 import SupportPanel from './pages/SupportPanel';
 import ChatBox from './components/ChatBox/ChatBox';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
 import OrderManagement from './pages/OrderManagement';
-import MyOrders from './pages/MyOrders';
 import './App.css';
 
 // Protected Route Component - Check token and optional role
@@ -86,6 +86,16 @@ export default function App() {
           element={
             <ProtectedRoute>
               <CartPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected Route - Checkout */}
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <CheckoutPage />
             </ProtectedRoute>
           }
         />
@@ -197,7 +207,7 @@ export default function App() {
           path="/my-orders"
           element={
             <ProtectedRoute>
-              <MyOrders />
+              <UserProfile />
             </ProtectedRoute>
           }
         />

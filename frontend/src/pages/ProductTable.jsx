@@ -51,9 +51,19 @@ export default function ProductTable({
                 {p.isDeleted ? (
                   <span className={`${styles.badge} ${styles.badgeDanger}`}>Đã xóa</span>
                 ) : (
-                  <span className={`${styles.badge} ${p.stock > 0 ? styles.badgeSuccess : styles.badgeWarning}`}>
-                    {p.stock}
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
+                    <span className={`${styles.badge} ${(p.stock - (p.reserved || 0)) > 0 ? styles.badgeSuccess : styles.badgeWarning}`}>
+                      Còn lại: {(p.stock - (p.reserved || 0))}
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>
+                      Tổng: {p.stock} | Đã bán: {p.soldCount || 0}
+                    </span>
+                    {(p.reserved || 0) > 0 && (
+                      <span style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 600 }}>
+                        (Đang giữ: {p.reserved})
+                      </span>
+                    )}
+                  </div>
                 )}
               </td>
               <td className={`${styles.tableCell} ${p.isDeleted ? styles.tableCellDeleted : ''}`}>{p.category?.name || '--'}</td>
