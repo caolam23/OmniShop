@@ -17,17 +17,19 @@ const SOCKET_URL = import.meta.env.VITE_API_BASE_URL
     ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '')
     : 'http://localhost:3000';
 
-export function useSocket(roomId, onMessage, userInfo = null, onPresence = null) {
+export function useSocket(roomId, onMessage, userInfo = null, onPresence = null, onNotification = null) {
     const socketRef = useRef(null);
     const [isConnected, setIsConnected] = useState(false);
     const onMessageRef = useRef(onMessage);
     const userInfoRef = useRef(userInfo);
     const onPresenceRef = useRef(onPresence);
+    const onNotificationRef = useRef(onNotification);
     const registerTimerRef = useRef(null);
 
     useEffect(() => { onMessageRef.current = onMessage; }, [onMessage]);
     useEffect(() => { userInfoRef.current = userInfo; }, [userInfo]);
     useEffect(() => { onPresenceRef.current = onPresence; }, [onPresence]);
+    useEffect(() => { onNotificationRef.current = onNotification; }, [onNotification]);
 
     // Effect 1: Tạo socket MỘT LẦN DUY NHẤT
     // Tất cả event listeners (message, presence) đều đặt tại đây
@@ -49,6 +51,13 @@ export function useSocket(roomId, onMessage, userInfo = null, onPresence = null)
         sock.on('new_message', (msg) => {
             if (typeof onMessageRef.current === 'function') {
                 onMessageRef.current(msg);
+            }
+        });
+
+        // ✅ new_notification listener
+        sock.on('new_notification', (msg) => {
+            if (typeof onNotificationRef.current === 'function') {
+                onNotificationRef.current(msg);
             }
         });
 

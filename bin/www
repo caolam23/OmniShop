@@ -34,6 +34,9 @@ const io = new Server(server, {
 const registerChatHandlers = require('../socketHandlers/chatHandler');
 registerChatHandlers(io);
 
+// Đính kèm io vào biến app để các Controller nội bộ khác có thể gọi bắn dữ liệu realtime
+app.set('io', io);
+
 /**
  * Listen on provided port, on all network interfaces.
  */

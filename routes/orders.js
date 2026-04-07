@@ -18,8 +18,8 @@ let productModel = require('../models/Product');
 // Nếu 1 bước lỗi → toàn bộ rollback
 // ============================================================
 router.post('/checkout', verifyToken, async function (req, res, next) {
-    let session = await mongoose.startSession();
-    session.startTransaction();
+    // let session = await mongoose.startSession();
+    // session.startTransaction();
     try {
         let user = req.user;
         let { shippingAddress, note } = req.body;
@@ -27,8 +27,6 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
         // Bước 1: Lấy giỏ hàng của user, populate thông tin sản phẩm
         let cart = await cartModel.findOne({ user: user._id }).populate('products.product');
         if (!cart || cart.products.length === 0) {
-            await session.abortTransaction();
-            await session.endSession();
             return res.status(400).send({ message: 'Giỏ hàng trống, không thể đặt hàng' });
         }
 
@@ -48,17 +46,17 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
             shippingAddress: shippingAddress || '',
             note: note || ''
         });
-        await newOrder.save({ session });
+        await newOrder.save();
 
         // Bước 4: Tạo OrderDetails và kiểm tra/trừ tồn kho
         for (let item of cart.products) {
-            // Kiểm tra tồn kho
-            let inventory = await inventoryModel.findOne({ product: item.product._id }).session(session);
-            if (!inventory || inventory.stock < item.quantity) {
-                await session.abortTransaction();
-                await session.endSession();
+            // Kiểm tra tồn kho trên Product model
+            let productRecord = await productModel.findById(item.product._id);
+            if (!productRecord || productRecord.stock < item.quantity) {
+                // Xoá Đơn hàng phụ đề phòng kẹt rác nếu rollback giả lập
+                await orderModel.findByIdAndDelete(newOrder._id);
                 return res.status(400).send({
-                    message: `Sản phẩm "${item.product.title}" không đủ số lượng trong kho`
+                    message: `Sản phẩm "${item.product.name}" không đủ số lượng trong kho (Còn ${productRecord?.stock || 0} sản phẩm)`
                 });
             }
 
@@ -70,21 +68,29 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
                 unitPrice: item.product.price,
                 subtotal: item.product.price * item.quantity
             });
-            await detail.save({ session });
+            await detail.save();
 
             // Trừ tồn kho bằng $inc (atomic update - tránh race condition)
-            inventory.stock -= item.quantity;
-            inventory.soldCount += item.quantity;
-            await inventory.save({ session });
+            productRecord.stock -= item.quantity;
+            await productRecord.save();
         }
 
         // Bước 5: Xóa giỏ hàng (clear products)
         cart.products = [];
-        await cart.save({ session });
+        await cart.save();
 
-        // Tất cả OK → Commit transaction
-        await session.commitTransaction();
-        await session.endSession();
+        // Tất cả OK → (Đã tắt strict Transaction local)
+        // await session.commitTransaction();
+        // Bắt đầu bắn Notification
+        const { createAndEmitNotification } = require('../controllers/notificationController');
+        const io = req.app.get('io');
+        await createAndEmitNotification(io, {
+            userId: user._id,
+            title: 'Đặt hàng thành công! 🎉',
+            message: `Mã đơn hàng ${newOrder._id.toString().substring(0, 8)} đã được tạo. Vui lòng chờ xác nhận.`,
+            type: 'NEW_ORDER',
+            relatedId: newOrder._id
+        });
 
         res.send({
             message: 'Đặt hàng thành công',
@@ -92,9 +98,9 @@ router.post('/checkout', verifyToken, async function (req, res, next) {
         });
 
     } catch (error) {
-        // Bất kỳ lỗi nào → Rollback toàn bộ
-        await session.abortTransaction();
-        await session.endSession();
+        // Bất kỳ lỗi nào → Rollback (Giả lập)
+        // await session.abortTransaction();
+        // await session.endSession();
         res.status(500).send({ message: error.message });
     }
 });
@@ -235,6 +241,22 @@ router.patch('/:id/status', verifyToken, checkRole(['Admin', 'Staff']), async fu
         if (!order) {
             return res.status(404).send({ message: 'Không tìm thấy đơn hàng' });
         }
+
+        // Bắn notification khi update status
+        const { createAndEmitNotification } = require('../controllers/notificationController');
+        const io = req.app.get('io');
+        let statusText = status === 'confirmed' ? 'đã được xác nhận'
+            : status === 'shipping' ? 'đang trong quá trình giao hàng'
+                : status === 'delivered' ? 'đã được giao thành công'
+                    : status === 'cancelled' ? 'đã bị hủy' : 'đang chờ';
+
+        await createAndEmitNotification(io, {
+            userId: order.user,
+            title: 'Thông báo đơn hàng',
+            message: `Đơn hàng ${order._id.toString().substring(0, 8)} của bạn ${statusText}.`,
+            type: 'ORDER_STATUS',
+            relatedId: order._id
+        });
 
         res.send({ message: 'Cập nhật trạng thái thành công', order });
     } catch (error) {
