@@ -12,6 +12,8 @@ export default function AdminSidebar() {
   const isUserPath = ['/users', '/roles'].includes(currentPath);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(isUserPath);
 
+  const isOrderPath = ['/orders', '/my-orders'].includes(currentPath);
+
   // Tự động giữ trạng thái mở nếu đang ở nhóm trang Sản phẩm & Kho
   useEffect(() => {
     if (isProductPath) {
@@ -110,6 +112,17 @@ export default function AdminSidebar() {
               <line x1="7" y1="7" x2="7.01" y2="7"></line>
             </svg>
             Mã giảm giá
+          </Link>
+        </li>
+        <li>
+          <Link to="/orders" className={`${styles.navItem} ${isOrderPath ? styles.navItemActive : ''}`}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Quản lý Đơn hàng
           </Link>
         </li>
       </ul>

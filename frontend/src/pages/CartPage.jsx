@@ -67,15 +67,16 @@ export default function CartPage() {
   };
 
   const handleApplyCoupon = async () => {
-    if (!coupon) return;
+    if (!coupon.trim()) return alert('Vui lòng nhập mã giảm giá!');
     try {
+      // API /validate trả về { success, discount, coupon } - ta cần lưu object coupon để tính tiền
       const res = await couponApi.validateCoupon({ code: coupon, orderValue: subtotal });
       if (res.success) {
-        setAppliedCoupon(res.data);
-        alert('Áp dụng mã giảm giá thành công!');
+        setAppliedCoupon(res.coupon); // LƯU Ý: phải lấy res.coupon, không phải res.data
+        alert(`✅ Áp dụng thành công mã "${res.coupon.code}" - Tiết kiệm ${formatVND(res.discount)}!`);
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Lỗi khi áp dụng mã');
+      alert(err?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn');
       setAppliedCoupon(null);
     }
   };
@@ -171,14 +172,7 @@ export default function CartPage() {
                   </Link>
                   <p className={styles.itemPrice}>{formatVND(item.product.price)}</p>
                   
-                  <div className={styles.mobileActions}>
-                    <div className={styles.quantityControls}>
-                      <button onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)} disabled={item.quantity <= 1}>-</button>
-                      <input type="text" value={item.quantity} readOnly />
-                      <button onClick={() => handleUpdateQuantity(item.product._id, item.quantity + 1)}>+</button>
-                    </div>
-                    <button className={styles.removeBtnMobile} onClick={() => handleRemoveItem(item.product._id)}>Xóa</button>
-                  </div>
+                  {/* Đã gỡ bỏ mobileActions dư thừa ở đây */}
                 </div>
                 <div className={`${styles.quantityControls} ${styles.desktopOnly}`}>
                   <button onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)} disabled={item.quantity <= 1}>-</button>

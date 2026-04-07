@@ -13,6 +13,8 @@ import CategoryManagement from './pages/CategoryManagement';
 import SupplierManagement from './pages/SupplierManagement';
 import ProductDetail from './pages/ProductDetail';
 import CartPage from './pages/CartPage';
+import OrderManagement from './pages/OrderManagement';
+import MyOrders from './pages/MyOrders';
 import './App.css';
 
 // Protected Route Component - Check token and optional role
@@ -164,6 +166,26 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['Admin']}>
               <SupplierManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin/Staff: Quản lý Đơn hàng */}
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Staff']}>
+              <OrderManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Tất cả user đã đăng nhập: Lịch sử đơn hàng của tôi */}
+        <Route
+          path="/my-orders"
+          element={
+            <ProtectedRoute>
+              <MyOrders />
             </ProtectedRoute>
           }
         />

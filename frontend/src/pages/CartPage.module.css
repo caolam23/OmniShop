@@ -157,6 +157,17 @@
 }
 .removeBtn:hover { opacity: 0.7; }
 
+.removeBtnMobile {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Summary Card */
 .summaryCard {
   background: var(--bg-surface);
