@@ -1,0 +1,786 @@
+{
+  "info": {
+    "_postman_id": "omnishop-excel-import-health",
+    "name": "OmniShop - Excel Import & Health Check APIs",
+    "description": "Complete API collection for Excel Import and Health Check features with comprehensive tests and examples",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{admin_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "📋 Setup & Authentication",
+      "item": [
+        {
+          "name": "1. Login Get Admin Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('admin_token', jsonData.token);",
+                  "  pm.environment.set('admin_user_id', jsonData.user?._id);",
+                  "  console.log('✅ Token saved: ' + jsonData.token.substring(0, 20) + '...');",
+                  "} else {",
+                  "  console.log('❌ Login failed');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@omnishop.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Đăng nhập để lấy admin token"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get Categories List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  if (jsonData.data && jsonData.data.length > 0) {",
+                  "    var categoryId = jsonData.data[0]._id;",
+                  "    pm.environment.set('category_id', categoryId);",
+                  "    console.log('✅ First category ID: ' + categoryId);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories?limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Lấy danh sách categories để sử dụng trong import"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📥 Excel Import - Step by Step",
+      "item": [
+        {
+          "name": "Step 1️⃣ - Download Excel Template",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set('template_downloaded', true);",
+                  "  console.log('✅ Template downloaded successfully');",
+                  "  console.log('File will be saved as: template.xlsx');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/template",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "template"
+              ]
+            },
+            "description": "Bước 1️⃣: Tải về file template Excel\n\nChỉnh sửa trong Excel:\n- Thêm tên sản phẩm ở cột A\n- Thêm mô tả ở cột B\n- Thêm giá bán ở cột C\n- Thêm số lượng ở cột D\n- Danh mục, SKU, chiết khấu (tùy chọn)"
+          },
+          "response": []
+        },
+        {
+          "name": "Step 2️⃣ - Upload & Validate Excel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('✅ Validation complete');",
+                  "  console.log('Total rows: ' + jsonData.data.totalRows);",
+                  "  console.log('Valid rows: ' + jsonData.data.validRows);",
+                  "  console.log('Error rows: ' + jsonData.data.errorRows);",
+                  "  ",
+                  "  if (jsonData.data.products && jsonData.data.products.length > 0) {",
+                  "    pm.environment.set('products_to_import', JSON.stringify(jsonData.data.products));",
+                  "    console.log('✅ Products saved for next step');",
+                  "  }",
+                  "} else {",
+                  "  var errors = pm.response.json().data?.errors || [];",
+                  "  console.log('❌ Validation errors: ' + JSON.stringify(errors));",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Lưu ý: Bạn cần patch file template trong Postman Collections folder",
+                  "// Hoặc sử dụng file từ frontend cùng với formdata"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "template.xlsx",
+                  "disabled": false
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/upload-excel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "upload-excel"
+              ]
+            },
+            "description": "Bước 2️⃣: Upload file Excel để validate\n\nFile sẽ được kiểm tra:\n✓ Format Excel đúng\n✓ Dữ liệu bắt buộc không trống\n✓ Kiểu dữ liệu hợp lệ\n✓ Giá > 0, số lượng >= 0"
+          },
+          "response": []
+        },
+        {
+          "name": "Step 3️⃣ - Confirm & Import Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('✅ Import successful!');",
+                  "  console.log('Products imported: ' + jsonData.data.importedCount);",
+                  "  console.log('Products failed: ' + jsonData.data.failedCount);",
+                  "  ",
+                  "  if (jsonData.data.importedProducts.length > 0) {",
+                  "    console.log('Imported product IDs:');",
+                  "    jsonData.data.importedProducts.forEach(p => {",
+                  "      console.log('  - ' + p.name + ' (ID: ' + p._id + ')');",
+                  "    });",
+                  "  }",
+                  "} else {",
+                  "  console.log('❌ Import failed');",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Lấy danh sách products từ environment (dari step 2)",
+                  "var productsData = pm.environment.get('products_to_import');",
+                  "if (!productsData) {",
+                  "  console.log('⚠️ Warning: Please run Step 2 first to get products data');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": [\n    {\n      \"name\": \"Áo thun nam cotton\",\n      \"description\": \"Áo thun nam 100% cotton cao cấp\",\n      \"price\": 129000,\n      \"quantity\": 100,\n      \"category\": null,\n      \"supplier\": null,\n      \"sku\": \"AOTHUN-001\",\n      \"discount\": 10,\n      \"isActive\": true\n    },\n    {\n      \"name\": \"Quần jean nam\",\n      \"description\": \"Quần jean nam chất liệu tốt\",\n      \"price\": 299000,\n      \"quantity\": 50,\n      \"category\": null,\n      \"supplier\": null,\n      \"sku\": \"JEAN-001\",\n      \"discount\": 5,\n      \"isActive\": true\n    },\n    {\n      \"name\": \"Giày thể thao nam\",\n      \"description\": \"Giày thể thao nam đaň vải\",\n      \"price\": 399000,\n      \"quantity\": 30,\n      \"category\": null,\n      \"supplier\": null,\n      \"sku\": \"GIAY-001\",\n      \"discount\": 15,\n      \"isActive\": true\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/confirm-import",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "confirm-import"
+              ]
+            },
+            "description": "Bước 3️⃣: Xác nhận và nhập liệu sản phẩm vào database\n\nCác định:\n✓ Sẽ tạo Product records\n✓ Sẽ tạo Inventory records cho mỗi sản phẩm\n✓ Sử dụng transaction (rollback nếu có lỗi)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔍 Health Check APIs",
+      "item": [
+        {
+          "name": "Basic Health Check (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "console.log('=== HEALTH CHECK RESULT ===');",
+                  "console.log('Status: ' + jsonData.status);",
+                  "console.log('API: ' + jsonData.checks.api.status);",
+                  "console.log('Database: ' + jsonData.checks.database.status);",
+                  "console.log('  - Connection: ' + (jsonData.checks.database.connectionState || 'N/A'));",
+                  "console.log('  - Products count: ' + (jsonData.checks.database.productsCount || 'N/A'));",
+                  "console.log('Memory: ' + jsonData.checks.memory.heapUsed);",
+                  "console.log('Node.js: ' + jsonData.checks.nodejs.version);",
+                  "console.log('Uptime: ' + jsonData.uptime + 's');",
+                  "console.log('Response time: ' + jsonData.responseTime + 'ms');",
+                  "console.log('===========================');",
+                  "",
+                  "// Color-coded status",
+                  "if (jsonData.status === 'healthy') {",
+                  "  console.log('✅ All systems operational');",
+                  "} else if (jsonData.status === 'warning') {",
+                  "  console.log('⚠️ Some issues detected');",
+                  "} else {",
+                  "  console.log('❌ System unhealthy');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "health"
+              ]
+            },
+            "description": "Kiểm tra trạng thái API cơ bản (không cần token)\n\nThông tin được kiểm tra:\n- API server status\n- Database connection\n- Memory usage\n- Node.js version\n- System uptime"
+          },
+          "response": []
+        },
+        {
+          "name": "Detailed Health Check (Admin Only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  console.log('=== DETAILED HEALTH CHECK ===');",
+                  "  console.log('Environment: ' + jsonData.data.environment.nodeEnv);",
+                  "  console.log('Database: ' + jsonData.data.database.state);",
+                  "  console.log('');",
+                  "  console.log('Collection Stats:');",
+                  "  Object.keys(jsonData.data.collections).forEach(col => {",
+                  "    var stats = jsonData.data.collections[col];",
+                  "    console.log('  📦 ' + col + ': ' + stats.count + ' documents (' + stats.indexes + ' indexes)');",
+                  "  });",
+                  "  console.log('');",
+                  "  console.log('Performance:');",
+                  "  console.log('  📊 Memory - RSS: ' + jsonData.data.performance.memory.rss);",
+                  "  console.log('  📊 Memory - Heap Used: ' + jsonData.data.performance.memory.heapUsed);",
+                  "  console.log('==============================');",
+                  "} else if (pm.response.code === 403) {",
+                  "  console.log('❌ Admin only - Use an admin token');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/health/detailed",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "health",
+                "detailed"
+              ]
+            },
+            "description": "Kiểm tra chi tiết trạng thái tất cả components (Admin only)\n\nThông tin chi tiết:\n- Environment configuration\n- Server process info\n- Database connection details\n- Collections statistics (count, indexes)\n- Performance metrics (memory, CPU)\n- Node.js info"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🧪 Test Scenarios",
+      "item": [
+        {
+          "name": "Test Scenario 1: Valid Products Import",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('🧪 TEST: Valid Products Import');",
+                  "console.log('Expected: 3 products imported successfully');",
+                  "var jsonData = pm.response.json();",
+                  "if (pm.response.code === 201 && jsonData.data.importedCount === 3) {",
+                  "  console.log('✅ PASS: All 3 products imported');",
+                  "  postman.setNextRequest('Verify Products in Database');",
+                  "} else {",
+                  "  console.log('❌ FAIL: Expected 3 products, got ' + jsonData.data.importedCount);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": [\n    {\n      \"name\": \"Test Product 1\",\n      \"description\": \"Valid test product 1\",\n      \"price\": 100000,\n      \"quantity\": 50,\n      \"sku\": \"TEST-PROD-001\",\n      \"isActive\": true\n    },\n    {\n      \"name\": \"Test Product 2\",\n      \"description\": \"Valid test product 2\",\n      \"price\": 200000,\n      \"quantity\": 30,\n      \"sku\": \"TEST-PROD-002\",\n      \"isActive\": true\n    },\n    {\n      \"name\": \"Test Product 3\",\n      \"description\": \"Valid test product 3\",\n      \"price\": 150000,\n      \"quantity\": 20,\n      \"sku\": \"TEST-PROD-003\",\n      \"isActive\": true\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/confirm-import",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "confirm-import"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Products in Database",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products?search=TEST-PROD&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "TEST-PROD"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Xác nhận các sản phẩm vừa import đã lưu vào database"
+          },
+          "response": []
+        },
+        {
+          "name": "Test Scenario 2: Invalid Data Detection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('🧪 TEST: Invalid Data Detection');",
+                  "var jsonData = pm.response.json();",
+                  "if (pm.response.code === 400) {",
+                  "  console.log('✅ PASS: Invalid data detected');",
+                  "  console.log('Errors found: ' + jsonData.data.errors.length);",
+                  "  jsonData.data.errors.forEach(err => console.log('  - ' + err));",
+                  "} else {",
+                  "  console.log('❌ FAIL: Expected 400 error');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": [\n    {\n      \"name\": \"\",\n      \"description\": \"Missing name\",\n      \"price\": -100,\n      \"quantity\": \"not_a_number\",\n      \"sku\": \"INVALID-001\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/confirm-import",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "confirm-import"
+              ]
+            },
+            "description": "Test: Detect invalid data (missing name, negative price, invalid quantity)"
+          },
+          "response": []
+        },
+        {
+          "name": "Test Scenario 3: Health Check During Import",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('🧪 TEST: Health Check');",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.status === 'healthy') {",
+                  "  console.log('✅ PASS: System is healthy');",
+                  "  console.log('Database: ' + jsonData.checks.database.status);",
+                  "  console.log('API: ' + jsonData.checks.api.status);",
+                  "} else if (jsonData.status === 'warning') {",
+                  "  console.log('⚠️ WARNING: Some issues detected');",
+                  "} else {",
+                  "  console.log('❌ FAIL: System unhealthy');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "health"
+              ]
+            },
+            "description": "Check system health during/after import operations"
+          },
+          "response": []
+        },
+        {
+          "name": "Test Scenario 4: Unauthorized Access",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('🧪 TEST: Unauthorized Access');",
+                  "if (pm.response.code === 401 || pm.response.code === 403) {",
+                  "  console.log('✅ PASS: Access denied as expected');",
+                  "  console.log('Response code: ' + pm.response.code);",
+                  "} else {",
+                  "  console.log('❌ FAIL: Should deny access without token');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/confirm-import",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "confirm-import"
+              ]
+            },
+            "description": "Try to access protected endpoint without authentication"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📊 Monitoring & Analytics",
+      "item": [
+        {
+          "name": "Get Detailed Health Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/health/detailed",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "health",
+                "detailed"
+              ]
+            },
+            "description": "Get comprehensive health report including database stats"
+          },
+          "response": []
+        },
+        {
+          "name": "Count Total Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products?limit=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Get total products count from database"
+          },
+          "response": []
+        },
+        {
+          "name": "Monitor API Response Time",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseTime = pm.response.responseTime;",
+                  "console.log('Response time: ' + responseTime + 'ms');",
+                  "if (responseTime < 100) {",
+                  "  console.log('✅ Excellent response time');",
+                  "} else if (responseTime < 500) {",
+                  "  console.log('✅ Good response time');",
+                  "} else if (responseTime < 1000) {",
+                  "  console.log('⚠️ Acceptable response time');",
+                  "} else {",
+                  "  console.log('❌ Slow response time');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/import/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "import",
+                "health"
+              ]
+            },
+            "description": "Monitor API response time for health check endpoint"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "products_to_import",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

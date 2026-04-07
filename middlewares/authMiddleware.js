@@ -68,4 +68,39 @@ exports.checkRole = (allowedRoles) => {
   };
 };
 
+// Middleware authenticate - Alias cho verifyToken
+exports.authenticate = exports.verifyToken;
+
+// Middleware authorize - Alias cho checkRole nhưng chấp nhận role dạng lowercase
+exports.authorize = (allowedRoles) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'User not authenticated',
+        });
+      }
+
+      // Lấy tên role của user và convert thành lowercase để so sánh
+      const userRole = req.user.role?.name?.toLowerCase();
+      const normalizedAllowedRoles = allowedRoles.map(r => r.toLowerCase());
+
+      if (!userRole || !normalizedAllowedRoles.includes(userRole)) {
+        return res.status(403).json({
+          success: false,
+          message: `Access denied. Only ${allowedRoles.join(', ')} can access this resource`,
+        });
+      }
+
+      next();
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error checking role',
+      });
+    }
+  };
+};
+
 module.exports = exports;

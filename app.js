@@ -25,6 +25,7 @@ const uploadRoutes = require('./routes/upload');
 const notificationRoutes = require('./routes/notificationRoutes');
 const ordersRoutes = require('./routes/orders');
 const couponsRoutes = require('./routes/coupons');
+const importRoutes = require('./routes/importRoutes');
 
 const app = express();
 
@@ -77,12 +78,13 @@ app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/orders', ordersRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/coupons', couponsRoutes);
+app.use('/api/v1/import', importRoutes);
 
-// API health check
+// Root health check (redirect to proper endpoint)
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'API is running',
+    message: 'API is running - use /api/v1/import/health for detailed health check',
     timestamp: new Date().toISOString(),
   });
 });
