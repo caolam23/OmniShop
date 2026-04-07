@@ -410,4 +410,106 @@ router.patch('/:id/status', verifyToken, checkRole(['Admin', 'Staff']), async fu
     }
 });
 
+// ============================================================
+// GET /:id/export-invoice - Xuất hóa đơn PDF
+// ============================================================
+router.get('/:id/export-invoice', verifyToken, async function (req, res, next) {
+    try {
+        const PDFDocument = require('pdfkit');
+        const id = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({ message: 'Mã đơn hàng không hợp lệ' });
+        }
+
+        const order = await orderModel.findById(id).populate('user', 'username email phone');
+        if (!order) {
+            return res.status(404).send({ message: 'Không tìm thấy đơn hàng' });
+        }
+
+        const details = await orderDetailModel
+            .find({ order: id })
+            .populate('product', 'name price');
+
+        // Tạo PDF
+        const doc = new PDFDocument({ size: 'A4', margin: 50, bufferPages: true });
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=hoa-don-${order._id.toString().substring(0, 8)}.pdf`);
+
+        doc.pipe(res);
+
+        // Header
+        doc.fontSize(20).font('Courier').text('HOA DON MUA HANG', { align: 'center' });
+        doc.fontSize(10).font('Courier').text('OmniShop - Cua hang truc tuyen', { align: 'center' });
+        doc.moveDown();
+
+        // Thông tin đơn hàng
+        doc.fontSize(10).font('Courier').text(`Ma don hang: ${order._id.toString().substring(0, 8).toUpperCase()}`);
+        doc.text(`Ngay dat: ${new Date(order.createdAt).toLocaleString('vi-VN')}`);
+        doc.text(`Trang thai: ${order.status}`);
+        doc.moveDown();
+
+        // Thông tin khách hàng
+        doc.fontSize(11).font('Courier-Bold').text('Thong tin khach hang:');
+        doc.fontSize(10).font('Courier');
+        doc.text(`Ten: ${order.user?.username || 'N/A'}`);
+        doc.text(`Email: ${order.user?.email || 'N/A'}`);
+        doc.text(`Dia chi giao: ${order.shippingAddress}`);
+        if (order.note) doc.text(`Ghi chu: ${order.note}`);
+        doc.moveDown();
+
+        // Bảng sản phẩm
+        doc.fontSize(11).font('Courier-Bold').text('Chi tiet san pham:');
+        doc.moveDown(0.5);
+
+        // Header bảng
+        const startX = doc.x;
+        const startY = doc.y;
+        doc.fontSize(9).font('Courier-Bold');
+        doc.text('San pham', startX, startY, { width: 150 });
+        doc.text('So luong', startX + 150, startY, { width: 60 });
+        doc.text('Gia', startX + 210, startY, { width: 80 });
+        doc.text('Tong', startX + 290, startY, { width: 100 });
+
+        doc.moveTo(startX, doc.y + 5).lineTo(startX + 390, doc.y + 5).stroke();
+        doc.moveDown();
+
+        // Dòng sản phẩm
+        doc.fontSize(8).font('Courier');
+        let yPosition = doc.y;
+        for (let detail of details) {
+            doc.text(detail.product?.name || 'N/A', startX, yPosition, { width: 150 });
+            doc.text(detail.quantity.toString(), startX + 150, yPosition, { width: 60 });
+            doc.text(formatVND(detail.unitPrice), startX + 210, yPosition, { width: 80 });
+            doc.text(formatVND(detail.subtotal), startX + 290, yPosition, { width: 100 });
+            yPosition += 20;
+        }
+
+        doc.moveTo(startX, yPosition + 5).lineTo(startX + 390, yPosition + 5).stroke();
+        doc.moveDown(2);
+
+        // Tóm tắt thanh toán
+        const summaryX = startX + 200;
+        doc.fontSize(10).font('Courier');
+        doc.text(`Tong tien hang: ${formatVND(order.totalAmount)}`, summaryX);
+        if (order.discountAmount > 0) {
+            doc.text(`Giam gia: -${formatVND(order.discountAmount)}`, summaryX);
+        }
+        doc.font('Courier-Bold').text(`Thanh tien: ${formatVND(order.finalAmount)}`, summaryX);
+
+        doc.moveDown(3);
+        doc.fontSize(9).font('Courier').text('Cam on ban da mua sam tai OmniShop!', { align: 'center' });
+
+        doc.end();
+
+    } catch (error) {
+        console.error('Lỗi export invoice:', error);
+        res.status(500).send({ message: error.message });
+    }
+});
+
+function formatVND(amount) {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+}
+
 module.exports = router;

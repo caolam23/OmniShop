@@ -1,0 +1,366 @@
+{
+  "info": {
+    "_postman_id": "omnishop-orders-simple",
+    "name": "OmniShop Orders - Complete (11 APIs)",
+    "description": "Collection hoàn chỉnh: 1 Login + 5 Setup + 5 Main APIs để chụp ảnh",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 1. LOGIN - Admin",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@omnishop.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "auth", "login"]
+        },
+        "description": "Đăng nhập với tài khoản Admin\n\n📧 Email: admin@omnishop.com\n🔑 Password: password123\n\n✅ Copy token từ response → dùng cho các request khác"
+      }
+    },
+    {
+      "name": "🛒 2. CHECKOUT - Thanh Toán & Tạo Đơn Hàng",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shippingAddress\": \"123 Đường ABC, Quận 1, TP.HCM\",\n  \"note\": \"Giao lúc 10-11 sáng\",\n  \"couponCode\": \"DISCOUNT10\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/orders/checkout",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders", "checkout"]
+        },
+        "description": "� Tạo đơn hàng mới từ các sản phẩm trong giỏ hàng\n\n� Hệ thống sẽ:\n✓ Tạo Order\n✓ Tạo OrderDetail\n✓ Trừ tồn kho Product\n✓ Clear Cart\n✓ Áp dụng coupon (nếu có)\n\n⚠️ Ghi chú: Cần có sản phẩm trong giỏ hàng"
+      }
+    },
+    {
+      "name": "📋 3. MY ORDERS - Lấy Danh Sách Đơn Hàng",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/orders/my-orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders", "my-orders"]
+        },
+        "description": "📊 Tra cứu lịch sử các đơn hàng của người dùng hiện tại\n\n📌 Thông tin:\n✓ Mã đơn hàng\n✓ Xuất xứ\n✓ Tổng tiền\n✓ Giảm giá\n✓ Thành tiền\n✓ Trạng thái (pending, confirmed, shipping, delivered)\n✓ Ngày đặt hàng\n\n💡 Copy Order ID từ đây để dùng ở API 4 & 5"
+      }
+    },
+    {
+      "name": "📄 4. ORDER DETAIL - Xem Chi Tiết Đơn Hàng",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/orders/{{order_id}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders", "{{order_id}}"]
+        },
+        "description": "🔍 Lấy thông tin cụ thể của một đơn hàng qua ID\n\n📌 Trả về:\n✓ Thông tin đơn hàng đầy đủ\n✓ Danh sách sản phẩm (OrderDetail)\n✓ Tên, ảnh, giá sản phẩm\n✓ Số lượng, giá đơn vị\n✓ Thông tin khách hàng\n\n⚠️ Thay {{order_id}} = ID từ API 3"
+      }
+    },
+    {
+      "name": "✏️ 5. UPDATE STATUS - Cập Nhật Trạng Thái Đơn Hàng",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"confirmed\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/orders/{{order_id}}/status",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders", "{{order_id}}", "status"]
+        },
+        "description": "🔄 Đổi trạng thái đơn hàng\n\n📌 Trạng thái hợp lệ:\n✓ pending → Chờ xác nhận\n✓ confirmed → Đã xác nhận\n✓ shipping → Đang giao hàng\n✓ delivered → Đã giao hàng\n✓ cancelled → Đã hủy\n\n💡 Nếu hủy → tồn kho được hoàn lại\n\n⚠️ Thay {{order_id}} = ID từ API 3"
+      }
+    },
+    {
+      "name": "💾 6. EXPORT INVOICE - Tải Hóa Đơn PDF",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/orders/{{order_id}}/export-invoice",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders", "{{order_id}}", "export-invoice"]
+        },
+        "description": "📥 Tải xuống hóa đơn mua hàng dưới dạng file PDF\n\n📋 File PDF chứa:\n✓ Mã đơn hàng\n✓ Thông tin khách hàng\n✓ Danh sách sản phẩm (tên, số lượng, giá)\n✓ Tổng cộng\n✓ Giảm giá\n✓ Thành tiền\n✓ Ngày đặt hàng\n✓ Trạng thái\n\n💡 File PDF sẽ tự động download\n\n⚠️ Thay {{order_id}} = ID từ API 3"
+      }
+    },
+    {
+      "name": "⚙️ SETUP: Get Products (để lấy Product ID)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/products?limit=5",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "products"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "5"
+            }
+          ]
+        },
+        "description": "Lấy danh sách sản phẩm để copy ID cho API Add to Cart\n\n📌 Copy field _id của sản phẩm mà bạn muốn thêm vào giỏ"
+      }
+    },
+    {
+      "name": "⚙️ SETUP: Add Product to Cart",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productId\": \"PASTE_PRODUCT_ID_HERE\",\n  \"quantity\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/carts/add",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "carts", "add"]
+        },
+        "description": "Thêm sản phẩm vào giỏ hàng\n\n⚠️ Bước cần thiết trước khi CHECKOUT!\n\n📌 Thay PASTE_PRODUCT_ID_HERE = ID từ API 'Get Products'"
+      }
+    },
+    {
+      "name": "🔍 SETUP: View My Cart",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/carts",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "carts"]
+        },
+        "description": "Xem giỏ hàng hiện tại\n\n✅ Kiểm tra xem sản phẩm đã được thêm vào chưa"
+      }
+    },
+    {
+      "name": "📷 SCREENSHOT 1: Get My Orders (Danh Sách Đơn)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/orders/my-orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders", "my-orders"]
+        },
+        "description": "📸 CHỤP ẢNH CÁI NÀY\n\nHiển thị:\n✓ Danh sách tất cả đơn hàng của user\n✓ Mã đơn, tổng tiền, trạng thái, ngày đặt\n\n💡 Copy order ID bất kỳ để test các API khác"
+      }
+    },
+    {
+      "name": "📷 SCREENSHOT 2: Get Order Detail (Chi Tiết Đơn)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/orders/{{order_id}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders", "{{order_id}}"]
+        },
+        "description": "📸 CHỤP ẢNH CÁI NÀY\n\nHiển thị:\n✓ Thông tin đơn hàng đầy đủ\n✓ Danh sách sản phẩm chi tiết\n✓ Thông tin khách hàng\n✓ Tổng tiền & giảm giá\n\n⚠️ Thay {{order_id}} bằng ID từ SCREENSHOT 1"
+      }
+    },
+    {
+      "name": "📷 SCREENSHOT 3: Update Order Status (Cập Nhật)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"confirmed\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/orders/{{order_id}}/status",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders", "{{order_id}}", "status"]
+        },
+        "description": "📸 CHỤP ẢNH CÁI NÀY\n\nCập nhật trạng thái đơn:\n✓ pending → confirmed\n✓ confirmed → shipping\n✓ shipping → delivered\n✓ any → cancelled (hoàn lại stock)\n\n💡 Thay {{order_id}} bằng ID từ SCREENSHOT 1"
+      }
+    },
+    {
+      "name": "📷 SCREENSHOT 4: Export Order to PDF (Tải PDF)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/orders/{{order_id}}/export-invoice",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders", "{{order_id}}", "export-invoice"]
+        },
+        "description": "📸 CHỤP ẢNH PREVIEW TAB\n\nXuất PDF hóa đơn:\n✓ File sẽ xuất hiện ở tab Preview\n✓ Hoặc click 'Save Response' để lưu file\n\n💡 Thay {{order_id}} bằng ID từ SCREENSHOT 1"
+      }
+    },
+    {
+      "name": "📷 SCREENSHOT 5: List All Orders (Admin)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/orders?status=pending&page=1&limit=10",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "orders"],
+          "query": [
+            {
+              "key": "status",
+              "value": "pending",
+              "description": "Filter by status"
+            },
+            {
+              "key": "page",
+              "value": "1",
+              "description": "Page number"
+            },
+            {
+              "key": "limit",
+              "value": "10",
+              "description": "Items per page"
+            }
+          ]
+        },
+        "description": "📸 CHỤP ẢNH CÁI NÀY\n\nAdmin xem tất cả đơn:\n✓ Danh sách tất cả đơn hàng trong hệ thống\n✓ Filter theo trạng thái\n✓ Phân trang\n\n✅ Sẽ hiển thị đơn hàng từ tất cả users"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

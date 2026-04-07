@@ -30,6 +30,11 @@ const orderApi = {
     exportExcel: () => {
         return axiosClient.get('/orders/export', { responseType: 'blob' });
     },
+
+    // Export invoice PDF cho một đơn hàng
+    exportInvoice: (id) => {
+        return axiosClient.get(`/orders/${id}/export-invoice`, { responseType: 'blob' });
+    },
 };
 
 export default orderApi;
