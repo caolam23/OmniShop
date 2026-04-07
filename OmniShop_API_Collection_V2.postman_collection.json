@@ -1,0 +1,365 @@
+{
+  "info": {
+    "_postman_id": "omnishop-api-v2-complete",
+    "name": "OmniShop API v2.0 - Complete Collection (60+ Endpoints)",
+    "description": "Đầy đủ API endpoints cho OmniShop bao gồm Cart, Orders, Coupons, Notifications",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. AUTHENTICATION (3)",
+      "item": [
+        {
+          "name": "1.1 Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"email\":\"user@example.com\",\"password\":\"password123\",\"fullName\":\"John Doe\"}"},
+            "url": {"raw": "http://localhost:3000/api/v1/auth/register", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "auth", "register"]}
+          }
+        },
+        {
+          "name": "1.2 Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"email\":\"admin@omnishop.com\",\"password\":\"password123\"}"},
+            "url": {"raw": "http://localhost:3000/api/v1/auth/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "auth", "login"]}
+          }
+        },
+        {
+          "name": "1.3 Get Me",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "http://localhost:3000/api/v1/auth/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "auth", "me"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. USER MANAGEMENT (7)",
+      "item": [
+        {
+          "name": "2.1 Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "http://localhost:3000/api/v1/users", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "users"]}
+          }
+        },
+        {
+          "name": "2.2 Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "http://localhost:3000/api/v1/users/user_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "users", "user_id"]}
+          }
+        },
+        {
+          "name": "2.3 Create User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+            "body": {"mode": "raw", "raw": "{\"email\":\"newuser@example.com\",\"password\":\"password123\",\"fullName\":\"New User\",\"roleId\":\"role_id\"}"},
+            "url": {"raw": "http://localhost:3000/api/v1/users", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "users"]}
+          }
+        },
+        {
+          "name": "2.4 Update User",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}],
+            "body": {"mode": "raw", "raw": "{\"email\":\"updated@example.com\",\"fullName\":\"Updated Name\"}"},
+            "url": {"raw": "http://localhost:3000/api/v1/users/user_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "users", "user_id"]}
+          }
+        },
+        {
+          "name": "2.5 Delete User (Soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "http://localhost:3000/api/v1/users/user_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "users", "user_id"]}
+          }
+        },
+        {
+          "name": "2.6 Delete User (Force)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "http://localhost:3000/api/v1/users/user_id/force", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "users", "user_id", "force"]}
+          }
+        },
+        {
+          "name": "2.7 Restore User",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "http://localhost:3000/api/v1/users/user_id/restore", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "users", "user_id", "restore"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. ROLE MANAGEMENT (7)",
+      "item": [
+        {
+          "name": "3.1 Get All Roles",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/roles", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "roles"]}}
+        },
+        {
+          "name": "3.2 Get Role By ID",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/roles/role_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "roles", "role_id"]}}
+        },
+        {
+          "name": "3.3 Create Role",
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"name\":\"Manager\",\"description\":\"Manager role\",\"permissions\":[\"read\",\"write\"]}"}, "url": {"raw": "http://localhost:3000/api/v1/roles", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "roles"]}}
+        },
+        {
+          "name": "3.4 Update Role",
+          "request": {"method": "PUT", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"name\":\"Manager\",\"description\":\"Updated\",\"permissions\":[\"read\",\"write\",\"delete\"]}"}, "url": {"raw": "http://localhost:3000/api/v1/roles/role_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "roles", "role_id"]}}
+        },
+        {
+          "name": "3.5 Delete Role",
+          "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/roles/role_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "roles", "role_id"]}}
+        },
+        {
+          "name": "3.6 Delete Role (Force)",
+          "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/roles/role_id/force", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "roles", "role_id", "force"]}}
+        },
+        {
+          "name": "3.7 Restore Role",
+          "request": {"method": "PATCH", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/roles/role_id/restore", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "roles", "role_id", "restore"]}}
+        }
+      ]
+    },
+    {
+      "name": "4. PRODUCT MANAGEMENT (6)",
+      "item": [
+        {
+          "name": "4.1 Get All Products",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:3000/api/v1/products?page=1&limit=10", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "products"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "10"}]}}
+        },
+        {
+          "name": "4.2 Get Product By ID",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:3000/api/v1/products/product_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "products", "product_id"]}}
+        },
+        {
+          "name": "4.3 Create Product",
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"title\":\"Product Name\",\"description\":\"Description\",\"price\":99.99,\"stock\":100,\"category\":\"cat_id\",\"sku\":\"SKU001\"}"}, "url": {"raw": "http://localhost:3000/api/v1/products", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "products"]}}
+        },
+        {
+          "name": "4.4 Update Product",
+          "request": {"method": "PUT", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"title\":\"Updated Name\",\"price\":199.99,\"stock\":50}"}, "url": {"raw": "http://localhost:3000/api/v1/products/product_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "products", "product_id"]}}
+        },
+        {
+          "name": "4.5 Delete Product",
+          "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/products/product_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "products", "product_id"]}}
+        },
+        {
+          "name": "4.6 Restore Product",
+          "request": {"method": "PATCH", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/products/product_id/restore", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "products", "product_id", "restore"]}}
+        }
+      ]
+    },
+    {
+      "name": "5. CATEGORY MANAGEMENT (5)",
+      "item": [
+        {
+          "name": "5.1 Get All Categories",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:3000/api/v1/categories", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "categories"]}}
+        },
+        {
+          "name": "5.2 Get Category By ID",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:3000/api/v1/categories/cat_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "categories", "cat_id"]}}
+        },
+        {
+          "name": "5.3 Create Category",
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "formdata", "formdata": [{"key": "name", "value": "Electronics", "type": "text"}, {"key": "description", "value": "Electronic items", "type": "text"}, {"key": "image", "type": "file", "src": []}]}, "url": {"raw": "http://localhost:3000/api/v1/categories", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "categories"]}}
+        },
+        {
+          "name": "5.4 Update Category",
+          "request": {"method": "PUT", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "formdata", "formdata": [{"key": "name", "value": "Electronics Updated", "type": "text"}, {"key": "description", "value": "Updated", "type": "text"}, {"key": "image", "type": "file", "src": []}]}, "url": {"raw": "http://localhost:3000/api/v1/categories/cat_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "categories", "cat_id"]}}
+        },
+        {
+          "name": "5.5 Delete Category",
+          "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/categories/cat_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "categories", "cat_id"]}}
+        }
+      ]
+    },
+    {
+      "name": "6. SUPPLIER MANAGEMENT (5)",
+      "item": [
+        {
+          "name": "6.1 Get All Suppliers",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:3000/api/v1/suppliers", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "suppliers"]}}
+        },
+        {
+          "name": "6.2 Get Supplier By ID",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:3000/api/v1/suppliers/supplier_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "suppliers", "supplier_id"]}}
+        },
+        {
+          "name": "6.3 Create Supplier",
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"name\":\"Supplier Name\",\"email\":\"supplier@example.com\",\"phone\":\"0123456789\",\"address\":\"123 Main St\",\"website\":\"https://supplier.com\"}"}, "url": {"raw": "http://localhost:3000/api/v1/suppliers", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "suppliers"]}}
+        },
+        {
+          "name": "6.4 Update Supplier",
+          "request": {"method": "PUT", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"name\":\"Updated Supplier\",\"email\":\"updated@example.com\",\"phone\":\"0987654321\"}"}, "url": {"raw": "http://localhost:3000/api/v1/suppliers/supplier_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "suppliers", "supplier_id"]}}
+        },
+        {
+          "name": "6.5 Delete Supplier",
+          "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/suppliers/supplier_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "suppliers", "supplier_id"]}}
+        }
+      ]
+    },
+    {
+      "name": "7. CART MANAGEMENT (5) ⭐NEW",
+      "item": [
+        {
+          "name": "7.1 Get Cart",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/carts", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "carts"]}}
+        },
+        {
+          "name": "7.2 Add to Cart",
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"productId\":\"product_id\",\"quantity\":2}"}, "url": {"raw": "http://localhost:3000/api/v1/carts/add", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "carts", "add"]}}
+        },
+        {
+          "name": "7.3 Update Quantity",
+          "request": {"method": "PUT", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"productId\":\"product_id\",\"quantity\":5}"}, "url": {"raw": "http://localhost:3000/api/v1/carts/update", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "carts", "update"]}}
+        },
+        {
+          "name": "7.4 Remove from Cart",
+          "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/carts/remove/product_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "carts", "remove", "product_id"]}}
+        },
+        {
+          "name": "7.5 Clear Cart",
+          "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/carts/clear", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "carts", "clear"]}}
+        }
+      ]
+    },
+    {
+      "name": "8. ORDERS (5) ⭐NEW",
+      "item": [
+        {
+          "name": "8.1 Checkout (Create Order)",
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"shippingAddress\":\"123 Main St, City\",\"note\":\"\",\"couponCode\":\"DISCOUNT20\"}"}, "url": {"raw": "http://localhost:3000/api/v1/orders/checkout", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "orders", "checkout"]}}
+        },
+        {
+          "name": "8.2 Get My Orders",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/orders", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "orders"]}}
+        },
+        {
+          "name": "8.3 Get Order By ID",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/orders/order_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "orders", "order_id"]}}
+        },
+        {
+          "name": "8.4 Update Order Status",
+          "request": {"method": "PUT", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"status\":\"confirmed\"}"}, "url": {"raw": "http://localhost:3000/api/v1/orders/order_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "orders", "order_id"]}}
+        },
+        {
+          "name": "8.5 Export Invoice",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/orders/invoice/order_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "orders", "invoice", "order_id"]}}
+        }
+      ]
+    },
+    {
+      "name": "9. COUPONS (5) ⭐NEW",
+      "item": [
+        {
+          "name": "9.1 Get All Coupons",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/coupons", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "coupons"]}}
+        },
+        {
+          "name": "9.2 Create Coupon",
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"code\":\"DISCOUNT20\",\"discountType\":\"percentage\",\"discountValue\":20,\"minOrderValue\":100000,\"expiryDate\":\"2026-12-31\",\"usageLimit\":100}"}, "url": {"raw": "http://localhost:3000/api/v1/coupons", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "coupons"]}}
+        },
+        {
+          "name": "9.3 Validate Coupon",
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"code\":\"DISCOUNT20\",\"orderValue\":500000}"}, "url": {"raw": "http://localhost:3000/api/v1/coupons/validate", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "coupons", "validate"]}}
+        },
+        {
+          "name": "9.4 Update Coupon",
+          "request": {"method": "PUT", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"code\":\"DISCOUNT25\",\"discountValue\":25,\"expiryDate\":\"2026-12-31\"}"}, "url": {"raw": "http://localhost:3000/api/v1/coupons/coupon_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "coupons", "coupon_id"]}}
+        },
+        {
+          "name": "9.5 Delete Coupon",
+          "request": {"method": "DELETE", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/coupons/coupon_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "coupons", "coupon_id"]}}
+        }
+      ]
+    },
+    {
+      "name": "10. MESSAGE/CHAT (2)",
+      "item": [
+        {
+          "name": "10.1 Get Chat Rooms",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/messages/rooms/latest", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "messages", "rooms", "latest"]}}
+        },
+        {
+          "name": "10.2 Get Messages",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/messages/room_id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "messages", "room_id"]}}
+        }
+      ]
+    },
+    {
+      "name": "11. REVIEW MANAGEMENT (2)",
+      "item": [
+        {
+          "name": "11.1 Create Review",
+          "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "raw", "raw": "{\"productId\":\"product_id\",\"rating\":5,\"comment\":\"Excellent product!\"}"}, "url": {"raw": "http://localhost:3000/api/v1/reviews", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "reviews"]}}
+        },
+        {
+          "name": "11.2 Get Product Reviews",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:3000/api/v1/reviews/product/product_id?page=1&limit=10", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "reviews", "product", "product_id"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "10"}]}}
+        }
+      ]
+    },
+    {
+      "name": "12. NOTIFICATIONS (3) ⭐NEW",
+      "item": [
+        {
+          "name": "12.1 Get Notifications",
+          "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/notifications", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "notifications"]}}
+        },
+        {
+          "name": "12.2 Mark All as Read",
+          "request": {"method": "PATCH", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/notifications/read-all", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "notifications", "read-all"]}}
+        },
+        {
+          "name": "12.3 Mark One as Read",
+          "request": {"method": "PATCH", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": {"raw": "http://localhost:3000/api/v1/notifications/notification_id/read", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "notifications", "notification_id", "read"]}}
+        }
+      ]
+    },
+    {
+      "name": "13. UPLOAD MANAGEMENT (4)",
+      "item": [
+        {
+          "name": "13.1 Upload Single File",
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "formdata", "formdata": [{"key": "file", "type": "file", "src": []}]}, "url": {"raw": "http://localhost:3000/api/v1/upload/one_file", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "upload", "one_file"]}}
+        },
+        {
+          "name": "13.2 Upload Multiple Files",
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "formdata", "formdata": [{"key": "files", "type": "file", "src": []}]}, "url": {"raw": "http://localhost:3000/api/v1/upload/multiple_file", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "upload", "multiple_file"]}}
+        },
+        {
+          "name": "13.3 Download File",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:3000/api/v1/upload/filename.jpg", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "upload", "filename.jpg"]}}
+        },
+        {
+          "name": "13.4 Upload Excel",
+          "request": {"method": "POST", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "body": {"mode": "formdata", "formdata": [{"key": "file", "type": "file", "src": []}]}, "url": {"raw": "http://localhost:3000/api/v1/upload/excel", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "upload", "excel"]}}
+        }
+      ]
+    },
+    {
+      "name": "14. HEALTH CHECK (1)",
+      "item": [
+        {
+          "name": "14.1 Health Check",
+          "request": {"method": "GET", "url": {"raw": "http://localhost:3000/api/v1/health", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "v1", "health"]}}
+        }
+      ]
+    }
+  ],
+  "variable": [{"key": "token", "value": "", "type": "string"}]
+}
