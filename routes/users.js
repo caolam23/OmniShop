@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 let { validatedResult, CreateUserValidator, ModifyUserValidator } = require("../utils/validator")
-let userModel = require("../schemas/users");
+let userModel = require("../models/User");
 let userController = require("../controllers/users");
 const { checkLogin,checkRole } = require("../utils/authHandler");
 

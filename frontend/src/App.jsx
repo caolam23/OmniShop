@@ -6,6 +6,8 @@ import UserProfile from './pages/UserProfile';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import RoleManagement from './pages/RoleManagement';
+import OrderManagement from './pages/OrderManagement';
+import MyOrders from './pages/MyOrders';
 import HomePage from './pages/HomePage';
 import ProductManagement from './pages/ProductManagement';
 import CategoryManagement from './pages/CategoryManagement';
@@ -145,6 +147,25 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['Admin']}>
               <SupplierManagement />
+            </ProtectedRoute>
+          }
+        />
+        {/* Admin/Staff Only: Quản lý đơn hàng */}
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute allowedRoles={['Admin', 'Staff']}>
+              <OrderManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Customer: Lịch sử đơn hàng của tôi */}
+        <Route
+          path="/my-orders"
+          element={
+            <ProtectedRoute>
+              <MyOrders />
             </ProtectedRoute>
           }
         />

@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
-let { checkLogin } = require('../utils/authHandler')
-let { uploadImage } = require('../utils/uploadHandler')
-let userSchema = require('../schemas/users')
-let messageSchema = require('../schemas/messages')
-router.post('/', checkLogin, uploadImage.single('file'), async function (req, res, next) {
+let { verifyToken } = require('../middlewares/authMiddleware')
+let upload = require('../middlewares/uploadMiddleware')
+let userSchema = require('../models/User')
+let messageSchema = require('../models/Message')
+router.post('/', verifyToken, upload.single('file'), async function (req, res, next) {
     let user01 = req.user._id;
     let user02 = req.body.to;
     let getUser = await userSchema.findById(user02);
@@ -29,7 +29,7 @@ router.post('/', checkLogin, uploadImage.single('file'), async function (req, re
     await newMess.save();
     res.send(newMess)
 })
-router.get('/:userid', checkLogin, async function (req, res, next) {
+router.get('/:userid', verifyToken, async function (req, res, next) {
     let user01 = req.user._id;
     let user02 = req.params.userid;
     let getUser = await userSchema.findById(user02);
@@ -51,7 +51,7 @@ router.get('/:userid', checkLogin, async function (req, res, next) {
     })
     res.send(messages)
 })
-router.get('/', checkLogin, async function (req, res, next) {
+router.get('/', verifyToken, async function (req, res, next) {
     let user01 = req.user._id;
 
     let messages = await messageSchema.find({

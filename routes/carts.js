@@ -1,17 +1,17 @@
 var express = require('express');
 var router = express.Router();
-const { checkLogin, checkRole } = require("../utils/authHandler");
-let cartModel = require('../schemas/carts')
-let inventoryModel = require('../schemas/inventories')
+const { verifyToken, checkRole } = require("../middlewares/authMiddleware");
+let cartModel = require('../models/Carts')
+let inventoryModel = require('../models/Inventories')
 
-router.get('/', checkLogin, async function (req, res, next) {
+router.get('/', verifyToken, async function (req, res, next) {
     let user = req.user;
     let cart = await cartModel.findOne({
         user: user._id
     })
     res.send(cart)
 })
-router.post('/add', checkLogin, async function (req, res, next) {
+router.post('/add', verifyToken, async function (req, res, next) {
     let { product, quantity } = req.body;
     let productItem = await inventoryModel.findOne({
         product: product
@@ -60,7 +60,7 @@ router.post('/add', checkLogin, async function (req, res, next) {
     }
     res.send(cart)
 })
-router.post('/remove', checkLogin, async function (req, res, next) {
+router.post('/remove', verifyToken, async function (req, res, next) {
     let { product, quantity } = req.body;
     let productItem = await inventoryModel.findOne({
         product: product

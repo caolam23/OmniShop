@@ -19,10 +19,15 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  const isImage = file.mimetype.startsWith('image/');
+  const isExcel = file.mimetype.includes('excel') || 
+                  file.mimetype.includes('spreadsheetml') || 
+                  file.originalname.match(/\.(xlsx|xls|csv)$/i);
+
+  if (isImage || isExcel) {
     cb(null, true);
   } else {
-    cb(new Error('Chỉ được phép upload file ảnh!'), false);
+    cb(new Error('Chỉ được phép upload file ảnh hoặc excel!'), false);
   }
 };
 
