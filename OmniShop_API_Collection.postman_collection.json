@@ -1,0 +1,1113 @@
+{
+  "info": {
+    "_postman_id": "omnishop-api-collection",
+    "name": "OmniShop API - Complete Collection",
+    "description": "Danh sách đầy đủ các API endpoints cho OmniShop",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. AUTHENTICATION",
+      "item": [
+        {
+          "name": "Register - Đăng ký",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"John Doe\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login - Đăng nhập",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Me - Lấy thông tin user",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/auth/me",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. USER MANAGEMENT",
+      "item": [
+        {
+          "name": "Get All Users - Lấy danh sách User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get User By ID - Lấy User theo ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/users/user_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "users", "user_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Create User - Tạo User mới",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"New User\",\n  \"roleId\": \"role_id_here\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "Update User - Cập nhật User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"updated@example.com\",\n  \"fullName\": \"Updated Name\",\n  \"roleId\": \"role_id_here\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/users/user_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "users", "user_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Delete User (Soft) - Xóa User (mềm)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/users/user_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "users", "user_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Delete User (Force) - Xóa User (vĩnh viễn)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/users/user_id_here/force",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "users", "user_id_here", "force"]
+            }
+          }
+        },
+        {
+          "name": "Restore User - Khôi phục User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/users/user_id_here/restore",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "users", "user_id_here", "restore"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. ROLE MANAGEMENT",
+      "item": [
+        {
+          "name": "Get All Roles - Lấy danh sách Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/roles",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "roles"]
+            }
+          }
+        },
+        {
+          "name": "Get Role By ID - Lấy Role theo ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/roles/role_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "roles", "role_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Create Role - Tạo Role mới",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Manager\",\n  \"description\": \"Manager role with limited permissions\",\n  \"permissions\": [\"read\", \"write\"]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/roles",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "roles"]
+            }
+          }
+        },
+        {
+          "name": "Update Role - Cập nhật Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Manager Updated\",\n  \"description\": \"Updated description\",\n  \"permissions\": [\"read\", \"write\", \"delete\"]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/roles/role_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "roles", "role_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Role (Soft) - Xóa Role (mềm)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/roles/role_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "roles", "role_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Role (Force) - Xóa Role (vĩnh viễn)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/roles/role_id_here/force",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "roles", "role_id_here", "force"]
+            }
+          }
+        },
+        {
+          "name": "Restore Role - Khôi phục Role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/roles/role_id_here/restore",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "roles", "role_id_here", "restore"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. PRODUCT MANAGEMENT",
+      "item": [
+        {
+          "name": "Get All Products - Lấy danh sách Sản phẩm",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/v1/products?page=1&limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "products"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product By ID - Lấy Sản phẩm theo ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/v1/products/product_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "products", "product_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Create Product - Tạo Sản phẩm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "title",
+                  "value": "Product Name",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Product description",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "99.99",
+                  "type": "text"
+                },
+                {
+                  "key": "stock",
+                  "value": "100",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "category_id_here",
+                  "type": "text"
+                },
+                {
+                  "key": "sku",
+                  "value": "SKU12345",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/products",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "products"]
+            }
+          }
+        },
+        {
+          "name": "Update Product - Cập nhật Sản phẩm",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "title",
+                  "value": "Updated Product Name",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Updated description",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "199.99",
+                  "type": "text"
+                },
+                {
+                  "key": "stock",
+                  "value": "50",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/products/product_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "products", "product_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Product (Soft) - Xóa Sản phẩm (mềm)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/products/product_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "products", "product_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Restore Product - Khôi phục Sản phẩm",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/products/product_id_here/restore",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "products", "product_id_here", "restore"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. CATEGORY MANAGEMENT",
+      "item": [
+        {
+          "name": "Get All Categories - Lấy danh sách Danh mục",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/v1/categories",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Get Category By ID - Lấy Danh mục theo ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/v1/categories/category_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "categories", "category_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Create Category - Tạo Danh mục",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "name",
+                  "value": "Electronics",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Electronic products",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/categories",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Update Category - Cập nhật Danh mục",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "name",
+                  "value": "Updated Category",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Updated description",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/categories/category_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "categories", "category_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Category - Xóa Danh mục",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/categories/category_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "categories", "category_id_here"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. SUPPLIER MANAGEMENT",
+      "item": [
+        {
+          "name": "Get All Suppliers - Lấy danh sách Nhà cung cấp",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/v1/suppliers",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "suppliers"]
+            }
+          }
+        },
+        {
+          "name": "Get Supplier By ID - Lấy Nhà cung cấp theo ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/v1/suppliers/supplier_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "suppliers", "supplier_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Create Supplier - Tạo Nhà cung cấp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Supplier Name\",\n  \"email\": \"supplier@example.com\",\n  \"phone\": \"0123456789\",\n  \"address\": \"123 Main St\",\n  \"website\": \"https://supplier.com\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/suppliers",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "suppliers"]
+            }
+          }
+        },
+        {
+          "name": "Update Supplier - Cập nhật Nhà cung cấp",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Supplier\",\n  \"email\": \"updated@example.com\",\n  \"phone\": \"0987654321\",\n  \"address\": \"456 New St\",\n  \"website\": \"https://newsupplier.com\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/suppliers/supplier_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "suppliers", "supplier_id_here"]
+            }
+          }
+        },
+        {
+          "name": "Delete Supplier - Xóa Nhà cung cấp",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/suppliers/supplier_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "suppliers", "supplier_id_here"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. CART MANAGEMENT",
+      "item": [
+        {
+          "name": "Get Cart - Lấy Giỏ hàng",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/carts",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "carts"]
+            }
+          }
+        },
+        {
+          "name": "Add to Cart - Thêm vào Giỏ hàng",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product\": \"product_id_here\",\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/carts/add",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "carts", "add"]
+            }
+          }
+        },
+        {
+          "name": "Remove from Cart - Xóa khỏi Giỏ hàng",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product\": \"product_id_here\",\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/carts/remove",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "carts", "remove"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. MESSAGE/CHAT",
+      "item": [
+        {
+          "name": "Get Chat Rooms - Lấy danh sách Phòng chat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/messages/rooms/latest",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "messages", "rooms", "latest"]
+            }
+          }
+        },
+        {
+          "name": "Get Messages - Lấy Tin nhắn",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/v1/messages/room_id_here",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "messages", "room_id_here"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. REVIEW MANAGEMENT",
+      "item": [
+        {
+          "name": "Create Review - Tạo Đánh giá",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"product_id_here\",\n  \"rating\": 5,\n  \"comment\": \"Excellent product!\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/reviews",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get Product Reviews - Lấy Đánh giá Sản phẩm",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/v1/reviews/product/product_id_here?page=1&limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "reviews", "product", "product_id_here"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. UPLOAD MANAGEMENT",
+      "item": [
+        {
+          "name": "Upload Single File - Upload 1 File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/upload/one_file",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "upload", "one_file"]
+            }
+          }
+        },
+        {
+          "name": "Upload Multiple Files - Upload Nhiều Files",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/upload/multiple_file",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "upload", "multiple_file"]
+            }
+          }
+        },
+        {
+          "name": "Download File - Tải File",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/v1/upload/filename.jpg",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "upload", "filename.jpg"]
+            }
+          }
+        },
+        {
+          "name": "Upload Excel - Upload File Excel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/v1/upload/excel",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "upload", "excel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. HEALTH CHECK",
+      "item": [
+        {
+          "name": "Health Check - Kiểm tra API",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3000/api/v1/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "v1", "health"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

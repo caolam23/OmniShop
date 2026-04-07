@@ -61,4 +61,4 @@ typings/
 .next
 *.md
 *.txt
-uploads/
+uploads/*.md
